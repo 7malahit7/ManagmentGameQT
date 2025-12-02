@@ -15,10 +15,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
 
 # Включаем директории
 include_directories(
-    include/core
-    include/network
+    include/controller
     include/ui
-    include/utils
 )
 
 ## Собираем исходники
@@ -28,7 +26,6 @@ file(GLOB_RECURSE SOURCES
 
 ## Заголовки
 file(GLOB_RECURSE HEADERS
-    include/**/*.h
     include/**/*.h
 )
 
