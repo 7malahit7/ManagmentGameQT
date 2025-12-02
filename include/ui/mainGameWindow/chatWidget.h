@@ -5,7 +5,7 @@
 #include<QLineEdit>
 #include<QPushButton>
 #include<QBoxLayout>
-#include<QObject>
+#include<QString>
 
 class ChatWidget : public QWidget
 {
@@ -20,6 +20,10 @@ public:
 
     explicit ChatWidget(QWidget* parent = nullptr);
     ~ChatWidget() = default;
+private slots:
+    void sendButtonClicked();
+public slots:
+    void displayMessage(const QString& text);
 signals:
-
+    void sendMessage(const QString& text);
 };

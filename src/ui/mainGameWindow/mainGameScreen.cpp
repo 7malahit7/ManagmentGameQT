@@ -4,6 +4,8 @@
 MainGameWindow::MainGameWindow(const QVector<PlayerWidget*>& players, QWidget *parent)
     : QWidget(parent)
 {
+    chatController = new ChatController;
+
     headerWidget = new HeaderWidget("0", "Ожидание...",this);
     leftBarWidget = new LeftBarWidget(players,this);
     chatWidget = new ChatWidget(this);
@@ -28,6 +30,9 @@ MainGameWindow::MainGameWindow(const QVector<PlayerWidget*>& players, QWidget *p
 
     mainLayout->addSpacing(15);
 
+
+    connect(chatWidget, &ChatWidget::sendMessage, chatController,&ChatController::sendMessage);
+    connect(chatController, &ChatController::newMessage, chatWidget, &ChatWidget::displayMessage);
 }
 
 

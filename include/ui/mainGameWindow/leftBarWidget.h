@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QObject>
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QVector>

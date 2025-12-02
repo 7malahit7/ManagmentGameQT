@@ -7,7 +7,7 @@
 #include "mainGameWindow/headerWidget.h"
 #include "mainGameWindow/leftBarWidget.h"
 #include "mainGameWindow/playerWidget.h"
-
+#include "chatController.h"
 
 
 
@@ -24,14 +24,13 @@ private:
     HeaderWidget* headerWidget;
     LeftBarWidget* leftBarWidget;
     QPushButton* ReadyButton;
+
+    ChatController *chatController;
+
 public:
 
     explicit MainGameWindow(const QVector<PlayerWidget*>& players, QWidget *parent = nullptr);
     ~MainGameWindow() = default;
-
-
-
-signals:
 };
 
 

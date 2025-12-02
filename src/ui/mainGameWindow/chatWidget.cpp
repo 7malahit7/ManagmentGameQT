@@ -28,4 +28,24 @@ ChatWidget::ChatWidget(QWidget *parent)
     inputChat->setMaxLength(100);
     inputChat->setPlaceholderText("Введите сообщение...");
 
+
+    connect(sendMessageButton, &QPushButton::clicked, this, &ChatWidget::sendButtonClicked);
+    connect(inputChat, &QLineEdit::returnPressed, this, &ChatWidget::sendButtonClicked);
+}
+
+void ChatWidget::sendButtonClicked()
+{
+    QString text = inputChat->text();
+    if(!text.trimmed().isEmpty())
+    {
+        emit sendMessage(text);
+        inputChat->clear();
+    }
+}
+
+void ChatWidget::displayMessage(const QString &text)
+{
+    QString textForSend;
+    textForSend += "<span style='color: yellow'>Игрок: </span>" + text;
+    allChat->append(textForSend);
 }
