@@ -1,29 +1,22 @@
 #pragma once
-
-#include<QWidget>
-#include<QTextEdit>
-#include<QLineEdit>
-#include<QPushButton>
-#include<QBoxLayout>
-#include<QString>
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QLineEdit>
+#include <QTextEdit>
 
 class ChatWidget : public QWidget
 {
     Q_OBJECT
 private:
-    QTextEdit* allChat;
-    QLineEdit* inputChat;
-    QPushButton* sendMessageButton;
-    QVBoxLayout* mainLayout;
-    QHBoxLayout* inputLayout;
-public:
+    QTextEdit* chatView;
+    QLineEdit* input;
 
+public:
     explicit ChatWidget(QWidget* parent = nullptr);
-    ~ChatWidget() = default;
-private slots:
-    void sendButtonClicked();
-public slots:
-    void displayMessage(const QString& text);
+
 signals:
-    void sendMessage(const QString& text);
+    void sendMessage(const QString &text);
+
+public slots:
+    void displayMessage(const QString &text);
 };

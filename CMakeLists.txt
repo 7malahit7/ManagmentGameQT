@@ -7,16 +7,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ## Включаем автогенерацию Qt
 set(CMAKE_AUTOMOC ON)
-# set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 ## Подключаем Qt
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Network)
 
 # Включаем директории
 include_directories(
     include/controller
     include/ui
+    include/ui/mainGameWindow
+    include/ui/menu
+    include/model
+
 )
 
 ## Собираем исходники
@@ -30,10 +33,10 @@ file(GLOB_RECURSE HEADERS
 )
 
 ## Создаем исполняемый файл
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
     ${SOURCES}
     ${HEADERS}
 )
 
 ## Линкуем библиотеки Qt
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Network)

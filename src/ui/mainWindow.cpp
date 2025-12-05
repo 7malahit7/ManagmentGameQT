@@ -1,38 +1,18 @@
 #include "mainWindow.h"
 
-
-
-MainWindow::MainWindow(const QVector<PlayerWidget*>& players,QWidget* parent)
+MainWindow::MainWindow(MainController* controller, QWidget* parent)
+    : QMainWindow(parent)
 {
-
-    setWindowTitle("ManagmentGame");
+    menuScreen = controller->getMenu();
+    gameScreen = controller->getGameScreen();
 
     screenSwitcher = new QStackedWidget(this);
-    gameScreen = new MainGameWindow(players,this);
-    menuScreen = new MenuWidget(this);
-
+    screenSwitcher->addWidget(menuScreen);
+    screenSwitcher->addWidget(gameScreen);
     setCentralWidget(screenSwitcher);
 
-    screenSwitcher->addWidget(gameScreen);
-    screenSwitcher->addWidget(menuScreen);
-    screenSwitcher->setCurrentWidget(menuScreen);
-
-    setMinimumSize(360, 320);
-    setMaximumSize(360, 320);
-    resize(360, 320);
-
-    QFont font1("Segoe UI", 14);
-    setFont(font1);
-
-    show();
-
-    connect(menuScreen, &MenuWidget::switchToGameScreen, this, &MainWindow::switchToGameScreen);
-}
-
-void MainWindow::switchToGameScreen()
-{
-    setMinimumSize(800, 800);
-    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-    showMaximized();
-    screenSwitcher->setCurrentWidget(gameScreen);
+    // Старт игры или подключение → смена экрана
+    connect(controller, &MainController::gameScreenRequested, [this]() {
+        screenSwitcher->setCurrentWidget(gameScreen);
+    });
 }

@@ -1,36 +1,34 @@
-#pragma once
+#ifndef MAINGAMESCREEN_H
+#define MAINGAMESCREEN_H
 
 #include <QWidget>
-
-
-#include "mainGameWindow/chatWidget.h"
-#include "mainGameWindow/headerWidget.h"
-#include "mainGameWindow/leftBarWidget.h"
-#include "mainGameWindow/playerWidget.h"
+#include <QPushButton>
+#include <QVBoxLayout>
+#include "headerWidget.h"
+#include "leftBarWidget.h"
+#include "chatWidget.h"
 #include "chatController.h"
 
-
-
-class MainGameWindow : public QWidget
+class MainGameScreen : public QWidget
 {
     Q_OBJECT
 private:
     QVBoxLayout* mainLayout;
-    QHBoxLayout* leftBarAndChatLayout;
-
-    QVector<PlayerWidget*> playersWidgets;
-
-    ChatWidget* chatWidget;
     HeaderWidget* headerWidget;
     LeftBarWidget* leftBarWidget;
+    ChatWidget* chatWidget;
     QPushButton* ReadyButton;
 
-    ChatController *chatController;
-
 public:
+    explicit MainGameScreen(QWidget* parent = nullptr);
 
-    explicit MainGameWindow(const QVector<PlayerWidget*>& players, QWidget *parent = nullptr);
-    ~MainGameWindow() = default;
+    ChatWidget* getChatWidget() const { return chatWidget; }
+
+    // Подключаем контроллер чата
+    void setChatController(ChatController* controller);
+
+signals:
+
 };
 
-
+#endif // MAINGAMESCREEN_H

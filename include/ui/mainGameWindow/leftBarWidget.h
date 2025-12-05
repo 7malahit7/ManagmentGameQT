@@ -6,7 +6,7 @@
 #include <QSplitter>
 #include <QStyle>
 
-#include "mainGameWindow/playerWidget.h"
+#include "playerWidget.h"
 
 
 class LeftBarWidget : public QWidget
@@ -17,7 +17,7 @@ private:
     QVBoxLayout* mainLayout;
     QVector<PlayerWidget*> players;
 public:
-    explicit LeftBarWidget(const QVector<PlayerWidget*> &players, QWidget* parent = nullptr);
+    explicit LeftBarWidget(QWidget* parent = nullptr);
 
     ~LeftBarWidget() = default;
 signals:

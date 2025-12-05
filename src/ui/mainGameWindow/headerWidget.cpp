@@ -1,4 +1,4 @@
-#include "mainGameWindow/headerWidget.h"
+#include "headerWidget.h"
 
 
 HeaderWidget::HeaderWidget(const QString& month, const QString& phase, QWidget* parent)

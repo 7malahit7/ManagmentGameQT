@@ -1,6 +1,6 @@
-#include "mainGameWindow/leftBarWidget.h"
+#include "leftBarWidget.h"
 
-LeftBarWidget::LeftBarWidget(const QVector<PlayerWidget *>& players, QWidget *parent)
+LeftBarWidget::LeftBarWidget(QWidget *parent)
     : QWidget(parent)
 {
     playersLabel = new QLabel("Игроки", this);
@@ -19,18 +19,18 @@ LeftBarWidget::LeftBarWidget(const QVector<PlayerWidget *>& players, QWidget *pa
     headerLine->setFixedWidth(300);
     headerLine->setStyleSheet("background-color: red;");
 
-    for(const auto &player : players){
-        QFrame* line = new QFrame(this);
-        line->setFrameShape(QFrame::HLine);
-        line->setFrameShadow(QFrame::Sunken);
+    // for(const auto &player : players){
+    //     QFrame* line = new QFrame(this);
+    //     line->setFrameShape(QFrame::HLine);
+    //     line->setFrameShadow(QFrame::Sunken);
 
-        player->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    //     player->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-        mainLayout->addWidget(player);
-        mainLayout->addSpacing(10);
-        mainLayout->addWidget(line);
-        mainLayout->addSpacing(10);
-    }
+    //     mainLayout->addWidget(player);
+    //     mainLayout->addSpacing(10);
+    //     mainLayout->addWidget(line);
+    //     mainLayout->addSpacing(10);
+    // }
     mainLayout->addStretch();
 
 }

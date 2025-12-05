@@ -1,4 +1,5 @@
-#include "mainGameWindow/playerWidget.h"
+#include "playerWidget.h"
+
 
 
 PlayerWidget::PlayerWidget(int id,
