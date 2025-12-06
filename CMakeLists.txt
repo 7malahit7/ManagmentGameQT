@@ -1,25 +1,35 @@
 cmake_minimum_required(VERSION 3.20)
 project(ManagmentGame LANGUAGES CXX)
 
-# Устанавливаем стандарт C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-## Включаем автогенерацию Qt
 set(CMAKE_AUTOMOC ON)
-# set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
 
-## Подключаем Qt
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
+#set(CMAKE_AUTORCC ON)
+                ## qt_add_resources(my_app "app_images"
+                ##     PREFIX "/"
+                ##     FILES
+                ##         images/copy.png
+                ##        images/cut.png
+                ##         images/new.png
+                ##         images/open.png
+                ##         images/paste.png
+                ##         images/save.png
+                ## )
 
-# Включаем директории
+
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Network)
+
 include_directories(
     include/controller
     include/ui
+    include/ui/mainGameWindow
+    include/ui/menu
+    include/model
+
 )
 
-## Собираем исходники
 file(GLOB_RECURSE SOURCES
     src/*.cpp
 )
@@ -29,11 +39,9 @@ file(GLOB_RECURSE HEADERS
     include/**/*.h
 )
 
-## Создаем исполняемый файл
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
     ${SOURCES}
     ${HEADERS}
 )
 
-## Линкуем библиотеки Qt
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Gui Qt6::Network)

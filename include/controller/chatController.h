@@ -1,16 +1,21 @@
 #pragma once
-
-#include<QObject>
-#include<QString>
+#include <QObject>
+#include <QJsonDocument>
 
 class ChatController : public QObject
 {
     Q_OBJECT
 public:
-    ChatController(QObject* parent = nullptr);
+    explicit ChatController(quint8 localId, bool isServerMode = false, QObject* parent = nullptr);
 
-public slots:
-    void sendMessage(const QString& text);
+    void onLocalMessage(const QString &text);
+    void onNetworkMessage(const QJsonDocument &msg);
+
 signals:
-    void newMessage(const QString& text);
+    void sendMessage(const QJsonDocument &msg);
+    void newMessage(const QString &text);
+
+private:
+    quint8 localId;
+    bool isServerMode;
 };

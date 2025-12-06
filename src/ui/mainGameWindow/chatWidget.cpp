@@ -1,8 +1,7 @@
-#include "mainGameWindow/chatWidget.h"
+#include "chatWidget.h"
 
-ChatWidget::ChatWidget(QWidget *parent)
+ChatWidget::ChatWidget(QWidget* parent) : QWidget(parent)
 {
-
     mainLayout = new QVBoxLayout(this);
     inputLayout = new QHBoxLayout();
 
@@ -29,23 +28,28 @@ ChatWidget::ChatWidget(QWidget *parent)
     inputChat->setPlaceholderText("Введите сообщение...");
 
 
-    connect(sendMessageButton, &QPushButton::clicked, this, &ChatWidget::sendButtonClicked);
-    connect(inputChat, &QLineEdit::returnPressed, this, &ChatWidget::sendButtonClicked);
-}
 
-void ChatWidget::sendButtonClicked()
-{
-    QString text = inputChat->text();
-    if(!text.trimmed().isEmpty())
-    {
-        emit sendMessage(text);
-        inputChat->clear();
-    }
+    connect(sendMessageButton, &QPushButton::clicked, this, [this](){
+        QString text = inputChat->text();
+        if(!text.isEmpty()){
+            emit sendMessage(text);
+            inputChat->clear();
+        }
+    });
+
+    connect(inputChat, &QLineEdit::returnPressed, this, [this](){
+        QString text = inputChat->text();
+        if(!text.isEmpty()){
+            emit sendMessage(text);
+            inputChat->clear();
+        }
+    });
 }
 
 void ChatWidget::displayMessage(const QString &text)
 {
-    QString textForSend;
-    textForSend += "<span style='color: yellow'>Игрок: </span>" + text;
-    allChat->append(textForSend);
+    QString message;
+    message += "> " + text;
+
+    allChat->append(message);
 }

@@ -1,11 +1,10 @@
 #pragma once
-
-#include<QWidget>
-#include<QTextEdit>
-#include<QLineEdit>
-#include<QPushButton>
-#include<QBoxLayout>
-#include<QString>
+#include <QWidget>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 class ChatWidget : public QWidget
 {
@@ -16,14 +15,11 @@ private:
     QPushButton* sendMessageButton;
     QVBoxLayout* mainLayout;
     QHBoxLayout* inputLayout;
-public:
 
+public:
     explicit ChatWidget(QWidget* parent = nullptr);
-    ~ChatWidget() = default;
-private slots:
-    void sendButtonClicked();
-public slots:
     void displayMessage(const QString& text);
+
 signals:
-    void sendMessage(const QString& text);
+    void sendMessage(const QString &text);
 };

@@ -1,13 +1,7 @@
 #pragma once
-
 #include <QWidget>
 #include <QVBoxLayout>
-#include <QVector>
-#include <QSplitter>
-#include <QStyle>
-
-#include "mainGameWindow/playerWidget.h"
-
+#include <QLabel>
 
 class LeftBarWidget : public QWidget
 {
@@ -15,13 +9,7 @@ class LeftBarWidget : public QWidget
 private:
     QLabel* playersLabel;
     QVBoxLayout* mainLayout;
-    QVector<PlayerWidget*> players;
+
 public:
-    explicit LeftBarWidget(const QVector<PlayerWidget*> &players, QWidget* parent = nullptr);
-
-    ~LeftBarWidget() = default;
-signals:
-
+    explicit LeftBarWidget(QWidget* parent = nullptr);
 };
-
-

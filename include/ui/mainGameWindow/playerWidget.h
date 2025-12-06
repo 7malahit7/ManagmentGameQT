@@ -1,17 +1,13 @@
 #pragma once
-
 #include <QWidget>
 #include <QLabel>
 #include <QGridLayout>
-#include <QStyle>
 
 class PlayerWidget : public QWidget
 {
-
     Q_OBJECT
 private:
     QGridLayout* mainLayout;
-
     QLabel* playerName;
     QLabel* playerStatus;
     QLabel* playerLevel;
@@ -33,9 +29,5 @@ public:
     void updateEgp(int egp);
     void updateBalance(int balance);
     void updateStatus(const QString& status);
-
     void updateItems(int level, int esm, int egp, int balance, const QString& status);
-    ~PlayerWidget() = default;
-signals:
-
 };

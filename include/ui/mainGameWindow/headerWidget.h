@@ -1,9 +1,7 @@
 #pragma once
-
-#include<QWidget>
-#include<QHBoxLayout>
-#include<QLabel>
-#include<QString>
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QLabel>
 
 class HeaderWidget : public QWidget
 {
@@ -15,10 +13,6 @@ private:
 
 public:
     explicit HeaderWidget(const QString& month, const QString& phase, QWidget* parent = nullptr);
-
-    void setMonth(const QString& month);
-    void setPhase(const QString& phase);
-
-    ~HeaderWidget() = default;
-signals:
+    void setMonth(const QString &month);
+    void setPhase(const QString &phase);
 };

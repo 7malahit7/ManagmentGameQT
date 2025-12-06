@@ -1,26 +1,18 @@
 #pragma once
-
-#include<QMainWindow>
-#include<QStackedWidget>
-
-#include "mainGameWindow/mainGameScreen.h"
-#include "menu/menu.h"
+#include <QMainWindow>
+#include <QStackedWidget>
+#include "mainController.h"
+#include "mainGameScreen.h"
+#include "menuWidget.h"
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+public:
+    explicit MainWindow(MainController* controller, QWidget* parent = nullptr);
 
 private:
     QStackedWidget* screenSwitcher;
-    MainGameWindow* gameScreen;
+    MainGameScreen* gameScreen;
     MenuWidget* menuScreen;
-public:
-    explicit MainWindow(const QVector<PlayerWidget*>& players,QWidget* parent = nullptr);
-    ~MainWindow() = default;
-
-private slots:
-    void switchToGameScreen();
-signals:
-
-
 };

@@ -1,38 +1,37 @@
-#include "mainGameWindow/mainGameScreen.h"
+#include "mainGameScreen.h"
 
-
-MainGameWindow::MainGameWindow(const QVector<PlayerWidget*>& players, QWidget *parent)
-    : QWidget(parent)
+MainGameScreen::MainGameScreen(QWidget* parent) : QWidget(parent)
 {
-    chatController = new ChatController;
-
-    headerWidget = new HeaderWidget("0", "Ожидание...",this);
-    leftBarWidget = new LeftBarWidget(players,this);
-    chatWidget = new ChatWidget(this);
-
     mainLayout = new QVBoxLayout(this);
+
+    headerWidget = new HeaderWidget("0", "Ожидание...", this);
+    leftBarWidget = new LeftBarWidget(this);
+    chatWidget = new ChatWidget(this);
+    readyButton = new QPushButton("Готов", this);
+
+    readyButton->setFixedHeight(80);
+
     leftBarAndChatLayout = new QHBoxLayout();
-
-    ReadyButton = new QPushButton("Готов");
-
-
+    leftBarWidget->setFixedWidth(400);
     leftBarAndChatLayout->addWidget(leftBarWidget);
     leftBarAndChatLayout->addSpacing(30);
-    leftBarAndChatLayout->addWidget(chatWidget);
-
-    leftBarWidget->setFixedWidth(400);
-
-    ReadyButton->setFixedHeight(80);
+    leftBarAndChatLayout->addWidget(chatWidget, 1);
 
     mainLayout->addWidget(headerWidget);
     mainLayout->addLayout(leftBarAndChatLayout);
-    mainLayout->addWidget(ReadyButton);
-
+    mainLayout->addWidget(readyButton);
     mainLayout->addSpacing(15);
 
 
-    connect(chatWidget, &ChatWidget::sendMessage, chatController,&ChatController::sendMessage);
-    connect(chatController, &ChatController::newMessage, chatWidget, &ChatWidget::displayMessage);
 }
 
-
+void MainGameScreen::setChatController(ChatController* controller)
+{
+    if(controller && chatWidget)
+    {
+        // Локальные сообщения → ChatController
+        QObject::connect(chatWidget, &ChatWidget::sendMessage, controller, &ChatController::onLocalMessage, Qt::UniqueConnection);
+        // Сообщения из сети → ChatWidget
+        QObject::connect(controller, &ChatController::newMessage, chatWidget, &ChatWidget::displayMessage, Qt::UniqueConnection);
+    }
+}
