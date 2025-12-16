@@ -12,18 +12,22 @@ MainController::MainController(QObject* parent) : QObject(parent)
     if(!session->getLocalPlayer()->getIsServer())
         isServerMode = false;
 
-    chatController = new ChatController(session->getLocalPlayer()->getId(), isServerMode, this);
-    mainGameScreen->setChatController(chatController);
+    if(isServerMode)
+    {connect(menu, &MenuWidget::startGameClicked, this, [this, isServerMode](){
+        chatController = new ChatController(session->getLocalPlayer()->getId(),
+                                            menu->getName(),
+                                            isServerMode, this);
 
-    connect(chatController, &ChatController::newMessage,
-            mainGameScreen->getChatWidget(), &ChatWidget::displayMessage,
-            Qt::UniqueConnection);
 
-    connect(mainGameScreen->getChatWidget(), &ChatWidget::sendMessage,
-            chatController, &ChatController::onLocalMessage,
-            Qt::UniqueConnection);
+        mainGameScreen->setChatController(chatController);
 
-    connect(menu, &MenuWidget::startGameClicked, this, [this](){
+        connect(chatController, &ChatController::newMessage,
+                mainGameScreen->getChatWidget(), &ChatWidget::displayMessage,
+                Qt::UniqueConnection);
+
+        connect(mainGameScreen->getChatWidget(), &ChatWidget::sendMessage,
+                chatController, &ChatController::onLocalMessage,
+                Qt::UniqueConnection);
         session->startGame(true);
 
         auto net = session->getNetwork();
@@ -38,10 +42,28 @@ MainController::MainController(QObject* parent) : QObject(parent)
         }
 
         emit gameScreenRequested();
-    });
+        });
+    }
 
-    // Клиент
-    connect(menu, &MenuWidget::connectClicked, this, [this](){
+    else{
+    connect(menu, &MenuWidget::connectClicked, this, [this, isServerMode](){
+
+        chatController = new ChatController(session->getLocalPlayer()->getId(),
+                                            menu->getName(),
+                                            isServerMode, this);
+
+
+        mainGameScreen->setChatController(chatController);
+
+        connect(chatController, &ChatController::newMessage,
+                mainGameScreen->getChatWidget(), &ChatWidget::displayMessage,
+                Qt::UniqueConnection);
+
+        connect(mainGameScreen->getChatWidget(), &ChatWidget::sendMessage,
+                chatController, &ChatController::onLocalMessage,
+                Qt::UniqueConnection);
+
+
         QString ip = menu->getIp();
         session->startNetworkGame(ip);
 
@@ -61,5 +83,8 @@ MainController::MainController(QObject* parent) : QObject(parent)
                 emit gameScreenRequested();
             });
         }
-    });
+        });
+    }
 }
+
+
