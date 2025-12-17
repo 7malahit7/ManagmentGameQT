@@ -30,8 +30,8 @@ void MainGameScreen::setChatController(ChatController* controller)
     if(controller && chatWidget)
     {
         // Локальные сообщения → ChatController
-        QObject::connect(chatWidget, &ChatWidget::sendMessage, controller, &ChatController::onLocalMessage, Qt::UniqueConnection);
+        QObject::connect(chatWidget, &ChatWidget::sendMessage, controller, &ChatController::sendChatMessage, Qt::UniqueConnection);
         // Сообщения из сети → ChatWidget
-        QObject::connect(controller, &ChatController::newMessage, chatWidget, &ChatWidget::displayMessage, Qt::UniqueConnection);
+        QObject::connect(controller, &ChatController::newMessageFromNetwork, chatWidget, &ChatWidget::displayMessage, Qt::UniqueConnection);
     }
 }

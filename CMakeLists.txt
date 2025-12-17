@@ -17,7 +17,7 @@ set(CMAKE_AUTOMOC ON)
                 ##         images/paste.png
                 ##         images/save.png
                 ## )
-
+#
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Network)
 

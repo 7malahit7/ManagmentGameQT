@@ -4,6 +4,9 @@
 #include <QString>
 #include <QJsonDocument>
 
+#include "networkController.h"
+
+
 class PlayerModel
 {
 public:
@@ -18,6 +21,8 @@ public:
 
     QJsonDocument toJson() const;
     void assignFromJsonId(const QString &jsonString);
+
+    void setId(quint8 newId);
 
 private:
     QString name;

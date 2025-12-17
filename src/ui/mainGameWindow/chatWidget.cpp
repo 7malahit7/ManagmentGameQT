@@ -32,6 +32,7 @@ ChatWidget::ChatWidget(QWidget* parent) : QWidget(parent)
     connect(sendMessageButton, &QPushButton::clicked, this, [this](){
         QString text = inputChat->text();
         if(!text.isEmpty()){
+            qDebug() << "[ChatWidget] send button pressed!";
             emit sendMessage(text);
             inputChat->clear();
         }
@@ -40,6 +41,7 @@ ChatWidget::ChatWidget(QWidget* parent) : QWidget(parent)
     connect(inputChat, &QLineEdit::returnPressed, this, [this](){
         QString text = inputChat->text();
         if(!text.isEmpty()){
+            qDebug() << "[ChatWidget] send button pressed!";
             emit sendMessage(text);
             inputChat->clear();
         }

@@ -1,5 +1,6 @@
 #include "mainController.h"
-#include "networkController.h"
+#include "clientController.h"
+#include "serverController.h"
 #include <QDebug>
 
 MainController::MainController(QObject* parent) : QObject(parent)
@@ -8,83 +9,73 @@ MainController::MainController(QObject* parent) : QObject(parent)
     menu = new MenuWidget();
     mainGameScreen = new MainGameScreen();
 
-    bool isServerMode = true;
-    if(!session->getLocalPlayer()->getIsServer())
-        isServerMode = false;
 
-    if(isServerMode)
-    {connect(menu, &MenuWidget::startGameClicked, this, [this, isServerMode](){
-        chatController = new ChatController(session->getLocalPlayer()->getId(),
-                                            menu->getName(),
-                                            isServerMode, this);
+    //хост
+    connect(menu, &MenuWidget::startGameClicked, this, [this](){
 
+        session->getLocalPlayer()->setName(menu->getName());
+        session->getLocalPlayer()->setIsServer(true);
+        session->getLocalPlayer()->setId(1);
 
-        mainGameScreen->setChatController(chatController);
-
-        connect(chatController, &ChatController::newMessage,
-                mainGameScreen->getChatWidget(), &ChatWidget::displayMessage,
-                Qt::UniqueConnection);
-
-        connect(mainGameScreen->getChatWidget(), &ChatWidget::sendMessage,
-                chatController, &ChatController::onLocalMessage,
-                Qt::UniqueConnection);
-        session->startGame(true);
+        session->startGameAsHost(true);
 
         auto net = session->getNetwork();
         if(net){
-            connect(net, &NetworkController::messageReceived,
+            initChatController(true);
+            connect(chatController, &ChatController::sendMessageToNetwork,
+                    static_cast<ServerController*>(net), &ServerController::sendChatMessageToServerOrBroadcast,
+                    Qt::UniqueConnection);
+
+            connect(static_cast<ServerController*>(net), &ServerController::messageReceived,
                     chatController, &ChatController::onNetworkMessage,
                     Qt::UniqueConnection);
-
-            connect(chatController, &ChatController::sendMessage,
-                    net, &NetworkController::sendMessageToServerOrBroadcast,
-                    Qt::UniqueConnection);
+            emit gameScreenRequested();
         }
 
-        emit gameScreenRequested();
-        });
-    }
+    });
 
-    else{
-    connect(menu, &MenuWidget::connectClicked, this, [this, isServerMode](){
-
-        chatController = new ChatController(session->getLocalPlayer()->getId(),
-                                            menu->getName(),
-                                            isServerMode, this);
-
-
-        mainGameScreen->setChatController(chatController);
-
-        connect(chatController, &ChatController::newMessage,
-                mainGameScreen->getChatWidget(), &ChatWidget::displayMessage,
-                Qt::UniqueConnection);
-
-        connect(mainGameScreen->getChatWidget(), &ChatWidget::sendMessage,
-                chatController, &ChatController::onLocalMessage,
-                Qt::UniqueConnection);
-
-
+    //клиент
+    connect(menu, &MenuWidget::connectClicked, this, [this](){
+        session->getLocalPlayer()->setName(menu->getName());
+        session->getLocalPlayer()->setIsServer(false);
+        session->getLocalPlayer()->setId(2);
         QString ip = menu->getIp();
-        session->startNetworkGame(ip);
-
+        session->connectToGame(ip);
         auto net = session->getNetwork();
-        if(net){
-            connect(net, &NetworkController::connected, this, [this, net](){
-                qDebug() << "[MainController] Client connected to server";
 
-                connect(net, &NetworkController::messageReceived,
+        if(net){
+            connect(static_cast<ClientController*>(net), &ClientController::connected, this, [this, net](){
+                initChatController(false);
+                connect(chatController, &ChatController::sendMessageToNetwork,
+                        static_cast<ClientController*>(net), &ClientController::sendChatMessageToServerOrBroadcast,
+                        Qt::UniqueConnection);
+
+                connect(static_cast<ClientController*>(net), &ClientController::messageReceived,
                         chatController, &ChatController::onNetworkMessage,
                         Qt::UniqueConnection);
-
-                connect(chatController, &ChatController::sendMessage,
-                        net, &NetworkController::sendMessageToServerOrBroadcast,
-                        Qt::UniqueConnection);
-
-                emit gameScreenRequested();
             });
+            emit gameScreenRequested();
         }
-        });
-    }
+
+    });
+
 }
+
+void MainController::initChatController(bool isServer)
+{
+    chatController = new ChatController(session->getLocalPlayer()->getId(),
+                                        session->getLocalPlayer()->getName(),
+                                        isServer, this);
+    mainGameScreen->setChatController(chatController);
+
+    connect(mainGameScreen->getChatWidget(), &ChatWidget::sendMessage,
+            chatController, &ChatController::sendChatMessage,
+            Qt::UniqueConnection);
+
+    connect(chatController, &ChatController::newMessageFromNetwork,
+            mainGameScreen->getChatWidget(), &ChatWidget::displayMessage,
+            Qt::UniqueConnection);
+}
+
 
 

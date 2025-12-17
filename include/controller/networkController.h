@@ -9,24 +9,11 @@ class NetworkController : public QObject
 {
     Q_OBJECT
 public:
-    explicit NetworkController(bool serverMode = true, const QString &host = "", QObject* parent = nullptr);
-
-    void startServer();
-    void connectToServer();
-    void sendMessageToServerOrBroadcast(const QJsonDocument &msg);
-
+    explicit NetworkController(QObject* parent = nullptr);
+    virtual void sendChatMessageToServerOrBroadcast(const QJsonDocument &msg) = 0;
 signals:
-    void connected();
     void messageReceived(const QJsonDocument &msg);
-
-private slots:
-    void onNewConnection();
-    void onDataReceived();
-
-private:
-    bool isServer;
-    QString host;
-    QTcpServer* server = nullptr;
-    QTcpSocket* socket = nullptr;
-    QVector<QTcpSocket*> clients;
+    void sendToNetwork();
+public slots:
+    virtual void onDataReceived() = 0;
 };

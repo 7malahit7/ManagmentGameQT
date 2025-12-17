@@ -7,37 +7,25 @@ ChatController::ChatController(quint8 localId, const QString& playerName, bool i
 {
 }
 
-void ChatController::onLocalMessage(const QString &text)
+void ChatController::sendChatMessage(const QString &text)
 {
     if(text.isEmpty()) return;
 
-    qDebug() << "[ChatController] Local message:" << text;
-
-    // создаём JSON-сообщение с id, именем и текстом
     QJsonObject obj;
-    obj["id"] = localId;
+    obj["type"] = "chat_message";
     obj["name"] = playerName;
     obj["text"] = text;
-    QJsonDocument msg(obj);
 
-    emit sendMessage(msg); // отправка через сеть
-    emit newMessage(QString("%1: %2").arg(playerName, text)); // отображение в локальном чате
+    QJsonDocument msg(obj);
+    qDebug() << "[ChatController] message sent to Network";
+    emit sendMessageToNetwork(msg); // отправка через сеть
 }
 
 void ChatController::onNetworkMessage(const QJsonDocument &msg)
 {
+    qDebug() << "[ChatController] Network Message Received, sending to chat";
     QJsonObject obj = msg.object();
-    quint8 id = obj["id"].toInt();
     QString senderName = obj["name"].toString();
     QString text = obj["text"].toString();
-
-    qDebug() << "[ChatController] Network message received from" << senderName << ":" << text;
-
-    // клиент не должен отображать свои же сообщения, отправленные на сервер
-    if(!isServerMode && id == localId) {
-        qDebug() << "[ChatController] Ignored own message (client)";
-        return;
-    }
-
-    emit newMessage(QString("%1: %2").arg(senderName, text)); // отображение сообщения с именем
+    emit newMessageFromNetwork(QString("%1: %2").arg(senderName, text)); // отображение сообщения с именем
 }

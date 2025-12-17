@@ -1,30 +1,30 @@
 #include "gameSession.h"
 #include "playerModel.h"
-#include "networkController.h"
+#include "clientController.h"
+#include "serverController.h"
+
 #include <QDebug>
 
 GameSession::GameSession(QObject* parent)
     : QObject(parent)
 {
-    localPlayer = new PlayerModel("Player", true, 1);
+    localPlayer = new PlayerModel("unknown", false, 0);
     network = nullptr;
 }
 
-void GameSession::startGame(bool serverMode)
+void GameSession::startGameAsHost(bool serverMode)
 {
-    if(serverMode && !network) {
-        network = new NetworkController(true, "", this);
-        qDebug() << "Server started!";
+    if(!network)
+    {
+        network = new ServerController(this);
     }
 
     emit gameStarted();
 }
-void GameSession::startNetworkGame(const QString& host)
+void GameSession::connectToGame(const QString& host)
 {
-    if(!network) {
-        network = new NetworkController(false, host, this);
-        network->connectToServer();
-    } else {
-        qDebug() << "[GameSession] Network already exists, skipping connect";
+    if(!network)
+    {
+        network = new ClientController(host, this);
     }
 }

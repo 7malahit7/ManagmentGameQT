@@ -13,8 +13,8 @@ class GameSession : public QObject
 public:
     explicit GameSession(QObject* parent = nullptr);
 
-    void startGame(bool serverMode);
-    void startNetworkGame(const QString& host);
+    void startGameAsHost(bool serverMode);
+    void connectToGame(const QString& host);
 
     PlayerModel* getLocalPlayer() const { return localPlayer; }
     NetworkController* getNetwork() const { return network; }

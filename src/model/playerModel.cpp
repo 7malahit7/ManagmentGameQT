@@ -12,6 +12,7 @@ quint8 PlayerModel::getId() const { return id; }
 
 void PlayerModel::setName(const QString &name) { this->name = name; }
 void PlayerModel::setIsServer(bool newIsServer) { isServer = newIsServer; }
+void PlayerModel::setId(quint8 newId) { id = newId; }
 
 QJsonDocument PlayerModel::toJson() const
 {
@@ -28,3 +29,5 @@ void PlayerModel::assignFromJsonId(const QString &jsonString)
     QJsonObject obj = doc.object();
     this->id = static_cast<quint8>(obj["id"].toInt());
 }
+
+

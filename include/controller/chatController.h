@@ -8,15 +8,15 @@ class ChatController : public QObject
 public:
     explicit ChatController(quint8 localId, const QString& playerName, bool isServerMode = false, QObject* parent = nullptr);
 
-    void onLocalMessage(const QString &text);
+    void sendChatMessage(const QString &text);
     void onNetworkMessage(const QJsonDocument &msg);
 
 signals:
-    void sendMessage(const QJsonDocument &msg);
-    void newMessage(const QString &text);
+    void sendMessageToNetwork(const QJsonDocument &msg);
+    void newMessageFromNetwork(const QString &text);
 
 private:
     quint8 localId;
     bool isServerMode;
-    QString playerName;  // имя игрока
+    QString playerName;
 };

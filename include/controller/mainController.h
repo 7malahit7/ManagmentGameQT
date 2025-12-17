@@ -22,4 +22,7 @@ private:
     MenuWidget* menu;
     MainGameScreen* mainGameScreen;
     ChatController* chatController;
+    bool isServerMode;
+
+    void initChatController(bool isServer);
 };
