@@ -48,10 +48,12 @@ ChatWidget::ChatWidget(QWidget* parent) : QWidget(parent)
     });
 }
 
-void ChatWidget::displayMessage(const QString &text)
+void ChatWidget::displayMessage(const QString &text, bool isSystem)
 {
     QString message;
-    message += "> " + text;
+    if(!isSystem)
+        message += "> ";
+    message += text;
 
     allChat->append(message);
 }

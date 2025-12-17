@@ -4,8 +4,6 @@
 #include <QString>
 #include <QJsonDocument>
 
-#include "networkController.h"
-
 
 class PlayerModel
 {

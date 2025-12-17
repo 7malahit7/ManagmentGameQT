@@ -10,13 +10,13 @@ MainController::MainController(QObject* parent) : QObject(parent)
     mainGameScreen = new MainGameScreen();
 
 
-    session->getLocalPlayer()->setName(menu->getName().isEmpty() ? "Player" : menu->getName());
+
 
     //хост
     connect(menu, &MenuWidget::startGameClicked, this, [this](){
         session->getLocalPlayer()->setIsServer(true);
         session->getLocalPlayer()->setId(1);
-
+        session->getLocalPlayer()->setName(menu->getName().isEmpty() ? "Player" : menu->getName());
         session->startGameAsHost(true);
 
         auto net = session->getNetwork();
@@ -31,13 +31,12 @@ MainController::MainController(QObject* parent) : QObject(parent)
                     Qt::UniqueConnection);
             emit gameScreenRequested();
         }
-
     });
 
     //клиент
     connect(menu, &MenuWidget::connectClicked, this, [this](){
+        session->getLocalPlayer()->setName(menu->getName().isEmpty() ? "Player" : menu->getName());
         session->getLocalPlayer()->setIsServer(false);
-        session->getLocalPlayer()->setId(2);
         QString ip = menu->getIp();
         session->connectToGame(ip);
         auto net = session->getNetwork();
@@ -55,10 +54,10 @@ MainController::MainController(QObject* parent) : QObject(parent)
             });
             emit gameScreenRequested();
         }
-
     });
-
 }
+
+
 
 void MainController::initChatController(bool isServer)
 {

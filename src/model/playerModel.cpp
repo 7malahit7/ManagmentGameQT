@@ -14,20 +14,20 @@ void PlayerModel::setName(const QString &name) { this->name = name; }
 void PlayerModel::setIsServer(bool newIsServer) { isServer = newIsServer; }
 void PlayerModel::setId(quint8 newId) { id = newId; }
 
-QJsonDocument PlayerModel::toJson() const
-{
-    QJsonObject jsonObject;
-    jsonObject["id"] = id;
-    jsonObject["name"] = name;
-    jsonObject["isServer"] = isServer;
-    return QJsonDocument(jsonObject);
-}
+// QJsonDocument PlayerModel::toJson() const
+// {
+//     QJsonObject jsonObject;
+//     jsonObject["id"] = id;
+//     jsonObject["name"] = name;
+//     jsonObject["isServer"] = isServer;
+//     return QJsonDocument(jsonObject);
+// }
 
-void PlayerModel::assignFromJsonId(const QString &jsonString)
-{
-    QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
-    QJsonObject obj = doc.object();
-    this->id = static_cast<quint8>(obj["id"].toInt());
-}
+// void PlayerModel::assignFromJsonId(const QString &jsonString)
+// {
+//     QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8());
+//     QJsonObject obj = doc.object();
+//     this->id = static_cast<quint8>(obj["id"].toInt());
+// }
 
 

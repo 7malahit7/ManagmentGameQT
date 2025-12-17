@@ -18,7 +18,7 @@ private:
 
 public:
     explicit ChatWidget(QWidget* parent = nullptr);
-    void displayMessage(const QString& text);
+    void displayMessage(const QString& text, bool isSystem);
 
 signals:
     void sendMessage(const QString &text);

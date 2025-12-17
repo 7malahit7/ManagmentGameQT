@@ -1,10 +1,10 @@
 #include "serverController.h"
 #include<QJsonObject>
-ServerController::ServerController(QObject *parent)
-    : NetworkController(parent)
+ServerController::ServerController(PlayerModel* player, QObject *parent)
+    : NetworkController(player, parent)
 {
+    nextId = 1;
     startServer();
-
 }
 void ServerController::startServer()
 {
@@ -17,16 +17,33 @@ void ServerController::startServer()
     qDebug() << "[ServerController] Server started!";
 }
 
-void ServerController::sendNewClientToChat()
-{
 
+void ServerController::onNewConnection()
+{
+    QTcpSocket* clientSocket = server->nextPendingConnection();
+
+
+    quint8 id = ++nextId;
+    socketToPlayer[clientSocket] = new PlayerModel("",false,id);
+    qDebug() << "[ServerController] Client connected! Total clients:" << socketToPlayer.size();
+    qDebug() << "[ServerController] Client connected! Assigned id =" << id;
+
+    connect(clientSocket, &QTcpSocket::readyRead, this, &ServerController::onDataReceived);
+}
+QJsonDocument ServerController::sendNewClientToChat(const QString& message)
+{
+    QJsonObject obj;
+    obj["type"] = "system_message";
+    obj["text"] = message;
+    QJsonDocument doc(obj);
+    return doc;
 }
 
-void ServerController::broadcast(const QJsonDocument &msg)
+void ServerController::broadcast(const QJsonDocument &msg, bool isSystem)
 {
-    sendChatMessage(msg);
+    sendChatMessage(msg, isSystem);
     qDebug() << "[ServerController] Broadcasting message";
-    for(QTcpSocket* client : clients){
+    for(QTcpSocket* client : socketToPlayer.keys()){
         qDebug() << "[ServerController] Making payload!";
         QByteArray payload = msg.toJson(QJsonDocument::Compact);
         payload.append('\n');
@@ -34,24 +51,13 @@ void ServerController::broadcast(const QJsonDocument &msg)
     }
 }
 
-void ServerController::sendChatMessage(const QJsonDocument &msg)
+void ServerController::sendChatMessage(const QJsonDocument &msg, bool isSystem)
 {
-    emit messageReceived(msg);
+    emit messageReceived(msg, isSystem);
 }
 
 
-void ServerController::onNewConnection()
-{
-    QTcpSocket* clientSocket = server->nextPendingConnection();
-    clients.append(clientSocket);
 
-    qDebug() << "[ServerController] Client connected! Total clients:" << clients.size();
-
-    quint8 id = nextId++;
-    // socketToId
-
-    connect(clientSocket, &QTcpSocket::readyRead, this, &ServerController::onDataReceived);
-}
 
 void ServerController::onDataReceived()
 {
@@ -62,13 +68,13 @@ void ServerController::onDataReceived()
 
     QString type = doc.object()["type"].toString();
     if(type == "chat_message"){
-        emit messageReceived(doc);
-        for(QTcpSocket* client : clients){
-            if(client != senderSocket){
-                client->write(doc.toJson());
-                qDebug() << "[ServerController] Broadcasted message to client";
-            }
-        }
+        broadcast(doc,false);
+    }
+    else if(type == "new_client")
+    {
+        QString name = doc.object()["name"].toString();
+        socketToPlayer[senderSocket]->setName(name);
+        broadcast(sendNewClientToChat(QString("<span style=\"color:green;\">Подключился %1</span>").arg(name)), true);
     }
 }
 

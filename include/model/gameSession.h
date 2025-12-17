@@ -1,6 +1,5 @@
 #ifndef GAMESESSION_H
 #define GAMESESSION_H
-#include "playerModel.h"
 #include <QObject>
 #include <QString>
 

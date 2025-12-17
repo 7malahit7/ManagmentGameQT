@@ -16,7 +16,7 @@ void GameSession::startGameAsHost(bool serverMode)
 {
     if(!network)
     {
-        network = new ServerController(this);
+        network = new ServerController(localPlayer, this);
     }
 
     emit gameStarted();
@@ -25,6 +25,6 @@ void GameSession::connectToGame(const QString& host)
 {
     if(!network)
     {
-        network = new ClientController(host, this);
+        network = new ClientController(localPlayer, host, this);
     }
 }
