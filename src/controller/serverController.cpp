@@ -4,6 +4,7 @@ ServerController::ServerController(QObject *parent)
     : NetworkController(parent)
 {
     startServer();
+
 }
 void ServerController::startServer()
 {
@@ -21,6 +22,23 @@ void ServerController::sendNewClientToChat()
 
 }
 
+void ServerController::broadcast(const QJsonDocument &msg)
+{
+    sendChatMessage(msg);
+    qDebug() << "[ServerController] Broadcasting message";
+    for(QTcpSocket* client : clients){
+        qDebug() << "[ServerController] Making payload!";
+        QByteArray payload = msg.toJson(QJsonDocument::Compact);
+        payload.append('\n');
+        client->write(payload);
+    }
+}
+
+void ServerController::sendChatMessage(const QJsonDocument &msg)
+{
+    emit messageReceived(msg);
+}
+
 
 void ServerController::onNewConnection()
 {
@@ -28,6 +46,9 @@ void ServerController::onNewConnection()
     clients.append(clientSocket);
 
     qDebug() << "[ServerController] Client connected! Total clients:" << clients.size();
+
+    quint8 id = nextId++;
+    // socketToId
 
     connect(clientSocket, &QTcpSocket::readyRead, this, &ServerController::onDataReceived);
 }
@@ -50,15 +71,7 @@ void ServerController::onDataReceived()
         }
     }
 }
-void ServerController::sendChatMessageToServerOrBroadcast(const QJsonDocument &msg)
-{
-    emit messageReceived(msg);
-    qDebug() << "[ServerController] Broadcasting message";
-    for(QTcpSocket* client : clients){
-        qDebug() << "[ServerController] Making payload!";
-        QByteArray payload = msg.toJson(QJsonDocument::Compact);
-        payload.append('\n');
-        client->write(payload);
-    }
 
-}
+
+
+

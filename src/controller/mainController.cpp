@@ -10,10 +10,10 @@ MainController::MainController(QObject* parent) : QObject(parent)
     mainGameScreen = new MainGameScreen();
 
 
+    session->getLocalPlayer()->setName(menu->getName().isEmpty() ? "Player" : menu->getName());
+
     //хост
     connect(menu, &MenuWidget::startGameClicked, this, [this](){
-
-        session->getLocalPlayer()->setName(menu->getName());
         session->getLocalPlayer()->setIsServer(true);
         session->getLocalPlayer()->setId(1);
 
@@ -23,7 +23,7 @@ MainController::MainController(QObject* parent) : QObject(parent)
         if(net){
             initChatController(true);
             connect(chatController, &ChatController::sendMessageToNetwork,
-                    static_cast<ServerController*>(net), &ServerController::sendChatMessageToServerOrBroadcast,
+                    static_cast<ServerController*>(net), &ServerController::broadcast,
                     Qt::UniqueConnection);
 
             connect(static_cast<ServerController*>(net), &ServerController::messageReceived,
@@ -36,7 +36,6 @@ MainController::MainController(QObject* parent) : QObject(parent)
 
     //клиент
     connect(menu, &MenuWidget::connectClicked, this, [this](){
-        session->getLocalPlayer()->setName(menu->getName());
         session->getLocalPlayer()->setIsServer(false);
         session->getLocalPlayer()->setId(2);
         QString ip = menu->getIp();
@@ -47,7 +46,7 @@ MainController::MainController(QObject* parent) : QObject(parent)
             connect(static_cast<ClientController*>(net), &ClientController::connected, this, [this, net](){
                 initChatController(false);
                 connect(chatController, &ChatController::sendMessageToNetwork,
-                        static_cast<ClientController*>(net), &ClientController::sendChatMessageToServerOrBroadcast,
+                        static_cast<ClientController*>(net), &ClientController::sendChatMessage,
                         Qt::UniqueConnection);
 
                 connect(static_cast<ClientController*>(net), &ClientController::messageReceived,

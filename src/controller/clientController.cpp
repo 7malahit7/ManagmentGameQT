@@ -28,7 +28,7 @@ void ClientController::connectToServer()
     connect(socket, &QTcpSocket::errorOccurred, [](QAbstractSocket::SocketError e){
         qDebug() << "[ClientController] Socket error:" << e;
     });
-
+    if(host.isEmpty()) host = "127.1";
     socket->connectToHost(host, 7777);
 }
 
@@ -47,7 +47,7 @@ void ClientController::onDataReceived()
     }
 }
 
-void ClientController::sendChatMessageToServerOrBroadcast(const QJsonDocument &msg)
+void ClientController::sendChatMessage(const QJsonDocument &msg)
 {
     emit messageReceived(msg);
     if(socket) {
@@ -57,5 +57,12 @@ void ClientController::sendChatMessageToServerOrBroadcast(const QJsonDocument &m
         qDebug() << "[ClientController] Message sent to server";
     }
 }
+
+void ClientController::broadcast(const QJsonDocument &msg)
+{
+    qWarning() << "broadcast called on client!!";
+}
+
+
 
 
