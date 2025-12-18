@@ -26,10 +26,14 @@ MainController::MainController(QObject* parent) : QObject(parent)
                     static_cast<ServerController*>(net), &ServerController::broadcast,
                     Qt::UniqueConnection);
 
-            connect(static_cast<ServerController*>(net), &ServerController::messageReceived,
+            connect(static_cast<ServerController*>(net), &ServerController::sendMessageToChatController,
                     chatController, &ChatController::onNetworkMessage,
                     Qt::UniqueConnection);
+
+            connect(static_cast<ServerController*>(net), &ServerController::updatePlayers, this, &MainController::updatePlayersOnScreen);
             emit gameScreenRequested();
+
+            static_cast<ServerController*>(net)->emitInitialPlayers();
         }
     });
 
@@ -48,13 +52,15 @@ MainController::MainController(QObject* parent) : QObject(parent)
                         static_cast<ClientController*>(net), &ClientController::sendChatMessage,
                         Qt::UniqueConnection);
 
-                connect(static_cast<ClientController*>(net), &ClientController::messageReceived,
+                connect(static_cast<ClientController*>(net), &ClientController::sendMessageToChatController,
                         chatController, &ChatController::onNetworkMessage,
                         Qt::UniqueConnection);
             });
             emit gameScreenRequested();
         }
     });
+
+
 }
 
 
@@ -73,6 +79,12 @@ void MainController::initChatController(bool isServer)
     connect(chatController, &ChatController::newMessageFromNetwork,
             mainGameScreen->getChatWidget(), &ChatWidget::displayMessage,
             Qt::UniqueConnection);
+}
+
+void MainController::updatePlayersOnScreen(const QVector<PlayerModel>& players)
+{
+    qDebug() << "[MainController] Updating players on screen";
+    mainGameScreen->getLeftBarWidget()->updatePlayers(players);
 }
 
 

@@ -1,5 +1,10 @@
 #include "mainGameScreen.h"
 
+LeftBarWidget *MainGameScreen::getLeftBarWidget() const
+{
+    return leftBarWidget;
+}
+
 MainGameScreen::MainGameScreen(QWidget* parent) : QWidget(parent)
 {
     mainLayout = new QVBoxLayout(this);

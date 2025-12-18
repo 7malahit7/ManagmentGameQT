@@ -38,10 +38,7 @@ void ClientController::sendNameToServer()
     QJsonObject obj;
     obj["type"] = "new_client";
     obj["name"] = localPlayer->getName();
-    QJsonDocument msg(obj);
-    QByteArray payload = msg.toJson(QJsonDocument::Compact);
-    payload.append('\n');
-    socket->write(payload);
+    socket->write(messageToSendingByteArray(obj));
 }
 
 
@@ -55,28 +52,32 @@ void ClientController::onDataReceived()
     QString type = doc.object()["type"].toString();
     if(type == "chat_message"){
         qDebug() << "[ClientController] Message Recevied!";
-        emit messageReceived(doc, false);
+        emit sendMessageToChatController(doc, MessageKind::UserMessage);
     }
     else if(type == "system_message")
     {
-        emit messageReceived(doc, true);
+        emit sendMessageToChatController(doc, MessageKind::SystemMessage);
+    }
+    else if(type == "assign_id")
+    {
+        localPlayer->setId(doc.object()["id"].toInt());
     }
 }
 
-void ClientController::sendChatMessage(const QJsonDocument &msg, bool isSystem)
+void ClientController::sendChatMessage(const QJsonDocument &msg, MessageKind isSystem)
 {
     if(socket) {
-        QByteArray payload = msg.toJson(QJsonDocument::Compact);
-        payload.append('\n');
-        socket->write(payload);
+        socket->write(messageToSendingByteArray(msg));
         qDebug() << "[ClientController] Message sent to server";
     }
 }
 
-void ClientController::broadcast(const QJsonDocument &msg, bool isSystem)
+void ClientController::broadcast(const QJsonDocument &msg, MessageKind isSystem)
 {
     qWarning() << "broadcast called on client!!";
 }
+
+
 
 
 

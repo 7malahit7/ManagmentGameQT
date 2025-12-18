@@ -10,8 +10,8 @@ signals:
 private slots:
     void onDataReceived() override;
 public slots:
-    void sendChatMessage(const QJsonDocument &msg, bool isSystem) override;
-    void broadcast(const QJsonDocument &msg, bool isSystem) override;
+    void sendChatMessage(const QJsonDocument &msg, MessageKind isSystem) override;
+    void broadcast(const QJsonDocument &msg, MessageKind isSystem) override;
 public:
     ClientController(PlayerModel* player, const QString &host, QObject *parent = nullptr);
     void connectToServer();

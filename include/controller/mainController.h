@@ -16,7 +16,8 @@ public:
 
 signals:
     void gameScreenRequested();
-
+private slots:
+    void updatePlayersOnScreen(const QVector<PlayerModel>& players);
 private:
     GameSession* session;
     MenuWidget* menu;
@@ -25,4 +26,5 @@ private:
     bool isServerMode;
 
     void initChatController(bool isServer);
+
 };

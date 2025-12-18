@@ -4,6 +4,8 @@ ServerController::ServerController(PlayerModel* player, QObject *parent)
     : NetworkController(player, parent)
 {
     nextId = 1;
+    playersInfo.append(PlayerModel(localPlayer->getName(), true, localPlayer->getId()));
+
     startServer();
 }
 void ServerController::startServer()
@@ -15,6 +17,39 @@ void ServerController::startServer()
     }
     connect(server, &QTcpServer::newConnection, this, &ServerController::onNewConnection);
     qDebug() << "[ServerController] Server started!";
+}
+
+void ServerController::onDataReceived()
+{
+    QTcpSocket* senderSocket = qobject_cast<QTcpSocket*>(sender());
+    if(!senderSocket) return;
+
+    QJsonDocument doc = QJsonDocument::fromJson(senderSocket->readAll());
+
+    QString type = doc.object()["type"].toString();
+    if(type == "chat_message"){
+        broadcast(doc,MessageKind::UserMessage);
+    }
+    else if(type == "new_client")
+    {
+        QString name = doc.object()["name"].toString();
+        socketToPlayer[senderSocket]->setName(name);
+
+        broadcast(sendNewClientToChat(name), MessageKind::SystemMessage);
+
+        playersInfo.append(PlayerModel(name, false ,nextId));
+        emit updatePlayers(playersInfo);
+    }
+}
+
+void ServerController::sendChatMessage(const QJsonDocument &msg, MessageKind isSystem)
+{
+    emit sendMessageToChatController(msg, isSystem);
+}
+
+void ServerController::emitInitialPlayers()
+{
+    emit updatePlayers(playersInfo);
 }
 
 
@@ -30,53 +65,32 @@ void ServerController::onNewConnection()
 
     connect(clientSocket, &QTcpSocket::readyRead, this, &ServerController::onDataReceived);
 }
-QJsonDocument ServerController::sendNewClientToChat(const QString& message)
-{
-    QJsonObject obj;
-    obj["type"] = "system_message";
-    obj["text"] = message;
-    QJsonDocument doc(obj);
-    return doc;
-}
 
-void ServerController::broadcast(const QJsonDocument &msg, bool isSystem)
+// void ServerController::broadcastPlayerInfo()
+// {
+//     QJsonObject obj;
+//     obj["type"] = "player_info";
+//     obj[""]
+// }
+void ServerController::broadcast(const QJsonDocument &msg, MessageKind isSystem)
 {
     sendChatMessage(msg, isSystem);
     qDebug() << "[ServerController] Broadcasting message";
     for(QTcpSocket* client : socketToPlayer.keys()){
-        qDebug() << "[ServerController] Making payload!";
-        QByteArray payload = msg.toJson(QJsonDocument::Compact);
-        payload.append('\n');
-        client->write(payload);
+        client->write(messageToSendingByteArray(msg));
     }
 }
 
-void ServerController::sendChatMessage(const QJsonDocument &msg, bool isSystem)
+QJsonDocument ServerController::sendNewClientToChat(const QString& name)
 {
-    emit messageReceived(msg, isSystem);
+    QJsonObject obj;
+    obj["type"] = "system_message";
+    obj["text"] = QString("<span style=\"color:yellow;\">Подключился %1</span>").arg(name);
+    QJsonDocument doc(obj);
+    return doc;
 }
 
 
-
-
-void ServerController::onDataReceived()
-{
-    QTcpSocket* senderSocket = qobject_cast<QTcpSocket*>(sender());
-    if(!senderSocket) return;
-
-    QJsonDocument doc = QJsonDocument::fromJson(senderSocket->readAll());
-
-    QString type = doc.object()["type"].toString();
-    if(type == "chat_message"){
-        broadcast(doc,false);
-    }
-    else if(type == "new_client")
-    {
-        QString name = doc.object()["name"].toString();
-        socketToPlayer[senderSocket]->setName(name);
-        broadcast(sendNewClientToChat(QString("<span style=\"color:green;\">Подключился %1</span>").arg(name)), true);
-    }
-}
 
 
 

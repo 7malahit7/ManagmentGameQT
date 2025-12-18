@@ -23,4 +23,5 @@ public:
     explicit MainGameScreen(QWidget* parent = nullptr);
     void setChatController(ChatController* controller);
     ChatWidget* getChatWidget() const { return chatWidget; }
+    LeftBarWidget *getLeftBarWidget() const;
 };

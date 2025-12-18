@@ -18,10 +18,10 @@ void ChatController::sendChatMessage(const QString &text)
 
     QJsonDocument msg(obj);
     qDebug() << "[ChatController] message sent to Network";
-    emit sendMessageToNetwork(msg, false); // отправка через сеть
+    emit sendMessageToNetwork(msg, MessageKind::UserMessage); // отправка через сеть
 }
 
-void ChatController::onNetworkMessage(const QJsonDocument &msg, bool isSystemMessage)
+void ChatController::onNetworkMessage(const QJsonDocument &msg, MessageKind isSystemMessage)
 {
     qDebug() << "[ChatController] Network Message Received, sending to chat";
     QJsonObject obj = msg.object();
