@@ -1,30 +1,28 @@
 #pragma once
+
 #include <QObject>
-#include "gameSession.h"
-#include "menuWidget.h"
-#include "mainGameScreen.h"
-#include "chatController.h"
+#include "gameModel.h"
+
+class NetworkController;
+class MenuWidget;
+class MainGameScreen;
 
 class MainController : public QObject
 {
     Q_OBJECT
 public:
-    explicit MainController(QObject* parent = nullptr);
+    explicit MainController(GameModel* model, QObject* parent = nullptr);
 
-    MenuWidget* getMenu() const { return menu; }
-    MainGameScreen* getGameScreen() const { return mainGameScreen; }
+    MenuWidget* menu() const;
+    MainGameScreen* gameScreen() const;
 
 signals:
     void gameScreenRequested();
-private slots:
-    void updatePlayersOnScreen(const QVector<PlayerModel>& players);
+
 private:
-    GameSession* session;
-    MenuWidget* menu;
-    MainGameScreen* mainGameScreen;
-    ChatController* chatController;
-    bool isServerMode;
+    GameModel* m_model;               // MVC: Model (НЕ владеем)
+    NetworkController* m_network;     // Controller управляет сетью
 
-    void initChatController(bool isServer);
-
+    MenuWidget* m_menu;               // View
+    MainGameScreen* m_gameScreen;     // View
 };
