@@ -1,14 +1,17 @@
 #include <QApplication>
-#include "mainWindow.h"
+
 #include "mainController.h"
+#include "mainWindow.h"
+#include "gameModel.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    MainController* controller = new MainController();
+    GameModel model;
+    MainController controller(&model);
 
-    MainWindow window(controller);
+    MainWindow window(&controller);
     window.show();
 
     return app.exec();
