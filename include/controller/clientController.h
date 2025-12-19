@@ -18,9 +18,11 @@ public:
     void connectToServer();
 
 private:
+    void processIncomingBuffer();
     QByteArray m_buffer;
     QString host;
     QTcpSocket* socket = nullptr;
     QVector<PlayerModel> playersInfo;
     void sendNameToServer();
+    void handlePlayersInfo(const QJsonObject &root);
 };

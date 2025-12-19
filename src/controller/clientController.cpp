@@ -53,7 +53,10 @@ void ClientController::onDataReceived()
     if (!socket) return;
 
     m_buffer += socket->readAll();
-
+    processIncomingBuffer();
+}
+void ClientController::processIncomingBuffer()
+{
     while (true) {
         int idx = m_buffer.indexOf('\n');
         if (idx == -1)
@@ -69,8 +72,10 @@ void ClientController::onDataReceived()
         QJsonObject root = doc.object();
         QString type = root["type"].toString();
 
-        // ===== дальше ТВОЙ СУЩЕСТВУЮЩИЙ код =====
-        if (type == "chat_message") {
+        if (type == "players_info") {
+            handlePlayersInfo(root);
+        }
+        else if (type == "chat_message") {
             emit sendMessageToChatController(doc, MessageKind::UserMessage);
         }
         else if (type == "system_message") {
@@ -79,20 +84,25 @@ void ClientController::onDataReceived()
         else if (type == "assign_id") {
             localPlayer->setId(root["id"].toInt());
         }
-        else if (type == "players_info") {
-            playersInfo.clear();
-            const QJsonArray arr = root["players"].toArray();
-            for (const auto& v : arr) {
-                PlayerModel model = PlayerModel::fromJson(v.toObject());
-                if (model.getName() == localPlayer->getName()) {
-                    *localPlayer = model;
-                }
-                playersInfo.append(model);
-            }
-            emit updatePlayers(playersInfo);
-        }
     }
 }
+void ClientController::handlePlayersInfo(const QJsonObject& root)
+{
+    playersInfo.clear();
+
+    const QJsonArray arr = root["players"].toArray();
+    for (const auto& v : arr) {
+        PlayerModel model = PlayerModel::fromJson(v.toObject());
+        if (model.getName() == localPlayer->getName()) {
+            *localPlayer = model;
+        }
+        playersInfo.append(model);
+    }
+
+    emit updatePlayers(playersInfo);
+}
+
+
 
 void ClientController::sendChatMessage(const QJsonDocument &msg, MessageKind isSystem)
 {
