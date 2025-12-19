@@ -7,6 +7,8 @@
 #include "clientController.h"
 #include "chatController.h"
 
+#include <QDebug>
+
 MainController::MainController(GameModel* model, QObject* parent)
     : QObject(parent),
     m_model(model),
@@ -18,7 +20,7 @@ MainController::MainController(GameModel* model, QObject* parent)
     m_menu = new MenuWidget();
     m_gameScreen = new MainGameScreen();
 
-    // ===== MENU → CONTROLLER (реальный API) =====
+    // ===== MENU → CONTROLLER =====
     connect(m_menu, &MenuWidget::startGameClicked, this, [this]() {
         const QString name = m_menu->getName();
         startServer(name);
@@ -42,44 +44,26 @@ MainGameScreen* MainController::gameScreen() const
 }
 
 // =======================
-// Network
+// Server
 // =======================
 
 void MainController::startServer(const QString& playerName)
 {
     qDebug() << "[] Starting as server";
-    if (m_network) {
-        qDebug() << "[MainController] Server already running";
+    if (m_network)
         return;
-    }
+
+    prepareLocalPlayer(playerName, true);
     auto& player = m_model->localPlayer();
-    player.setName(playerName);
-    player.setIsServer(true);
 
     auto* server = new ServerController(&player, this);
     m_network = server;
 
-    m_chatController = new ChatController(
-        player.getId(),
-        player.getName(),
+    setupChat(
         true,
-        this
-        );
-
-    // Network → Chat
-    connect(
-        m_network,
-        &NetworkController::sendMessageToChatController,
-        m_chatController,
-        &ChatController::onNetworkMessage
-        );
-    m_gameScreen->setChatController(m_chatController);
-    connect(
-        m_chatController,
-        &ChatController::sendMessageToNetwork,
-        m_network,
         &NetworkController::broadcast
         );
+
     connect(
         server,
         &ServerController::updatePlayers,
@@ -87,9 +71,14 @@ void MainController::startServer(const QString& playerName)
         &MainController::updatePlayersOnScreen,
         Qt::UniqueConnection
         );
+
     server->emitInitialPlayers();
     emit gameScreenRequested();
 }
+
+// =======================
+// Client
+// =======================
 
 void MainController::connectToServer(
     const QString& playerName,
@@ -101,34 +90,18 @@ void MainController::connectToServer(
         qDebug() << "[MainController] Already connected or connecting";
         return;
     }
+
+    prepareLocalPlayer(playerName, false);
     auto& player = m_model->localPlayer();
-    player.setName(playerName);
-    player.setIsServer(false);
 
     auto* client = new ClientController(&player, host, this);
     m_network = client;
 
-    m_chatController = new ChatController(
-        player.getId(),
-        player.getName(),
+    setupChat(
         false,
-        this
-        );
-
-    // Network → Chat
-    connect(
-        m_network,
-        &NetworkController::sendMessageToChatController,
-        m_chatController,
-        &ChatController::onNetworkMessage
-        );
-    m_gameScreen->setChatController(m_chatController);
-    connect(
-        m_chatController,
-        &ChatController::sendMessageToNetwork,
-        m_network,
         &NetworkController::sendChatMessage
         );
+
     connect(
         client,
         &ClientController::updatePlayers,
@@ -136,18 +109,63 @@ void MainController::connectToServer(
         &MainController::updatePlayersOnScreen,
         Qt::UniqueConnection
         );
+
     client->connectToServer();
     emit gameScreenRequested();
 }
+
+// =======================
+// Helpers
+// =======================
+
+void MainController::prepareLocalPlayer(const QString& name, bool isServer)
+{
+    auto& player = m_model->localPlayer();
+    player.setName(name);
+    player.setIsServer(isServer);
+}
+
+void MainController::setupChat(
+    bool isServer,
+    void (NetworkController::*sendFunc)(const QJsonDocument&, MessageKind)
+    )
+{
+    auto& player = m_model->localPlayer();
+
+    m_chatController = new ChatController(
+        player.getId(),
+        player.getName(),
+        isServer,
+        this
+        );
+
+    connect(
+        m_network,
+        &NetworkController::sendMessageToChatController,
+        m_chatController,
+        &ChatController::onNetworkMessage
+        );
+
+    m_gameScreen->setChatController(m_chatController);
+
+    connect(
+        m_chatController,
+        &ChatController::sendMessageToNetwork,
+        m_network,
+        sendFunc
+        );
+}
+
+// =======================
+// Players sync
+// =======================
 
 void MainController::updatePlayersOnScreen(
     const QVector<PlayerModel>& players
     )
 {
     qDebug() << "[MainController] updatePlayersOnScreen, count =" << players.size();
-    // Обновляем модель
-    m_model->setPlayers(players);
 
-    // Обновляем UI
+    m_model->setPlayers(players);
     m_gameScreen->getLeftBarWidget()->updatePlayers(players);
 }
