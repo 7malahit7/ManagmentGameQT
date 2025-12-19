@@ -7,6 +7,7 @@ class ClientController : public NetworkController
     Q_OBJECT
 signals:
     void connected();
+    void updatePlayers(const QVector<PlayerModel>& playersInfo);
 private slots:
     void onDataReceived() override;
 public slots:
@@ -19,5 +20,6 @@ public:
 private:
     QString host;
     QTcpSocket* socket = nullptr;
+    QVector<PlayerModel> playersInfo;
     void sendNameToServer();
 };

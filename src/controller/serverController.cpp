@@ -1,5 +1,7 @@
 #include "serverController.h"
-#include<QJsonObject>
+
+#include <QJsonArray>
+#include <QJsonObject>
 ServerController::ServerController(PlayerModel* player, QObject *parent)
     : NetworkController(player, parent)
 {
@@ -39,6 +41,8 @@ void ServerController::onDataReceived()
 
         playersInfo.append(PlayerModel(name, false ,nextId));
         emit updatePlayers(playersInfo);
+
+        broadcastPlayersInfo();
     }
 }
 
@@ -50,6 +54,8 @@ void ServerController::sendChatMessage(const QJsonDocument &msg, MessageKind isS
 void ServerController::emitInitialPlayers()
 {
     emit updatePlayers(playersInfo);
+
+    broadcastPlayersInfo();
 }
 
 
@@ -66,18 +72,32 @@ void ServerController::onNewConnection()
     connect(clientSocket, &QTcpSocket::readyRead, this, &ServerController::onDataReceived);
 }
 
-// void ServerController::broadcastPlayerInfo()
-// {
-//     QJsonObject obj;
-//     obj["type"] = "player_info";
-//     obj[""]
-// }
+
 void ServerController::broadcast(const QJsonDocument &msg, MessageKind isSystem)
 {
     sendChatMessage(msg, isSystem);
     qDebug() << "[ServerController] Broadcasting message";
     for(QTcpSocket* client : socketToPlayer.keys()){
         client->write(messageToSendingByteArray(msg));
+    }
+}
+void ServerController::broadcastPlayersInfo()
+{
+    QJsonArray playersArray;
+    for (const auto& player : playersInfo)
+    {
+        playersArray.append(player.toJsonObject());
+    }
+
+    QJsonObject obj;
+    obj["type"] = "players_info";
+    obj["players"] = playersArray;
+
+    QJsonDocument doc(obj);
+    qDebug() << "[ServerController] Broadcasting players info";
+
+    for(QTcpSocket* client : socketToPlayer.keys()){
+        client->write(messageToSendingByteArray(doc));
     }
 }
 

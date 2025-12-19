@@ -1,6 +1,7 @@
 #include "clientController.h"
 #include <QDebug>
 #include <QJsonObject>
+#include <QJsonArray>
 ClientController::ClientController(PlayerModel* player, const QString &host, QObject *parent)
     : NetworkController(player, parent), host{host}
 {
@@ -62,8 +63,28 @@ void ClientController::onDataReceived()
     {
         localPlayer->setId(doc.object()["id"].toInt());
     }
-}
+    else if(type == "players_info")
+    {
+        playersInfo.clear();
+        const QJsonArray playersArray = doc.object().value("players").toArray();
+        for (const auto& playerValue : playersArray)
+        {
+            const PlayerModel model = PlayerModel::fromJson(playerValue.toObject());
+            if (model.getName() == localPlayer->getName())
+            {
+                localPlayer->setId(model.getId());
+                localPlayer->setLevel(model.getLevel());
+                localPlayer->setBalance(model.getBalance());
+                localPlayer->setEgp(model.getEgp());
+                localPlayer->setEsm(model.getEsm());
+                localPlayer->setStatus(model.getStatus());
+            }
+            playersInfo.append(model);
+        }
 
+        emit updatePlayers(playersInfo);
+    }
+}
 void ClientController::sendChatMessage(const QJsonDocument &msg, MessageKind isSystem)
 {
     if(socket) {

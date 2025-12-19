@@ -22,6 +22,7 @@ public:
                           int balance,
                           int egp,
                           int esm,
+                          const QString& status = QStringLiteral("Ожидает..."),
                           QWidget* parent = nullptr);
 
     void updateLevel(int level);

@@ -29,5 +29,5 @@ private:
     QMap<QTcpSocket*, PlayerModel*> socketToPlayer;
     QVector<PlayerModel> playersInfo;
 
-    void broadcastPlayerInfo();
+    void broadcastPlayersInfo();
 };

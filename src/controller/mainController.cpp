@@ -55,6 +55,10 @@ MainController::MainController(QObject* parent) : QObject(parent)
                 connect(static_cast<ClientController*>(net), &ClientController::sendMessageToChatController,
                         chatController, &ChatController::onNetworkMessage,
                         Qt::UniqueConnection);
+
+                connect(static_cast<ClientController*>(net), &ClientController::updatePlayers,
+                        this, &MainController::updatePlayersOnScreen,
+                        Qt::UniqueConnection);
             });
             emit gameScreenRequested();
         }

@@ -11,7 +11,7 @@ class LeftBarWidget : public QWidget
 private:
     QLabel* playersLabel;
     QVBoxLayout* mainLayout;
-    void addNewPlayer(quint8 id, const QString& name);
+    void addNewPlayer(const PlayerModel& player);
     void clearPlayers();
 public:
     explicit LeftBarWidget(QWidget* parent = nullptr);

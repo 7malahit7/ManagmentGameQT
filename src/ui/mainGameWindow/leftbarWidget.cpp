@@ -1,5 +1,6 @@
 #include "leftBarWidget.h"
 #include <QFrame>
+#include <QDebug>
 
 LeftBarWidget::LeftBarWidget(QWidget *parent) : QWidget(parent)
 {
@@ -36,10 +37,16 @@ void LeftBarWidget::clearPlayers()
         }
     }
 }
-
-void LeftBarWidget::addNewPlayer(quint8 id, const QString &name)
+void LeftBarWidget::addNewPlayer(const PlayerModel &playerInfo)
 {
-    PlayerWidget* player = new PlayerWidget(id, name, 1, 10000, 10,10,this);
+    PlayerWidget* player = new PlayerWidget(playerInfo.getId(),
+                                            playerInfo.getName(),
+                                            playerInfo.getLevel(),
+                                            playerInfo.getBalance(),
+                                            playerInfo.getEgp(),
+                                            playerInfo.getEsm(),
+                                            playerInfo.getStatus(),
+                                            this);
     mainLayout->insertWidget(mainLayout->count() - 1, player);
 }
 
@@ -49,6 +56,6 @@ void LeftBarWidget::updatePlayers(const QVector<PlayerModel>& players)
     for (const auto& p : players)
     {
         qDebug() << "added player";
-        addNewPlayer(p.getId(), p.getName());
+        addNewPlayer(p);
     }
 }

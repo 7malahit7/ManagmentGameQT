@@ -6,6 +6,7 @@ PlayerWidget::PlayerWidget(int id,
                            int balance,
                            int egp,
                            int esm,
+                           const QString& status,
                            QWidget* parent)
     : QWidget(parent)
 {
@@ -16,7 +17,7 @@ PlayerWidget::PlayerWidget(int id,
     playerBalance = new QLabel(QString("%1$").arg(balance), this);
     playerEgp = new QLabel(QString("%1 ЕГП").arg(egp), this);
     playerEsm = new QLabel(QString("%1 ЕСМ").arg(esm), this);
-    playerStatus = new QLabel("Ожидает...", this);
+    playerStatus = new QLabel(status, this);
 
     playerBalance->setStyleSheet("color: lightgreen; font-family: Segoe UI; font-size: 14pt;");
 
