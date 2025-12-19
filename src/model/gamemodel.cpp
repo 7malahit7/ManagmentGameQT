@@ -1,8 +1,8 @@
 #include "gameModel.h"
 
 GameModel::GameModel()
-    : localPlayer("Player", false, 0),
-    state(GameState::NotStarted)
+    : m_localPlayer("Player", false, 0),
+    m_state(GameState::NotStarted)
 {
 }
 
