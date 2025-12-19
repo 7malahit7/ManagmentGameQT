@@ -1,5 +1,5 @@
-#ifndef GAMESESSION_H
-#define GAMESESSION_H
+#pragma once
+
 #include <QObject>
 #include <QString>
 
@@ -27,4 +27,4 @@ private:
     NetworkController* network;
 };
 
-#endif
+

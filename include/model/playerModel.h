@@ -1,5 +1,4 @@
-#ifndef PLAYERMODEL_H
-#define PLAYERMODEL_H
+#pragma once
 
 #include <QString>
 #include <QJsonDocument>
@@ -51,4 +50,4 @@ private:
     QString status;
 };
 
-#endif
+
