@@ -21,6 +21,9 @@ public:
 signals:
     void gameScreenRequested();
 
+private slots:
+    void updatePlayersOnScreen(const QVector<PlayerModel>& players);
+
 private:
     GameModel* m_model;               // MVC: Model (НЕ владеем)
     NetworkController* m_network;     // Controller управляет сетью

@@ -72,7 +72,21 @@ void MainController::startServer(const QString& playerName)
         m_chatController,
         &ChatController::onNetworkMessage
         );
-
+    m_gameScreen->setChatController(m_chatController);
+    connect(
+        m_chatController,
+        &ChatController::sendMessageToNetwork,
+        m_network,
+        &NetworkController::broadcast
+        );
+    connect(
+        server,
+        &ServerController::updatePlayers,
+        this,
+        &MainController::updatePlayersOnScreen,
+        Qt::UniqueConnection
+        );
+    server->emitInitialPlayers();
     emit gameScreenRequested();
 }
 
@@ -106,6 +120,24 @@ void MainController::connectToServer(
         m_chatController,
         &ChatController::onNetworkMessage
         );
+    m_gameScreen->setChatController(m_chatController);
+    connect(
+        m_chatController,
+        &ChatController::sendMessageToNetwork,
+        m_network,
+        &NetworkController::sendChatMessage
+        );
 
     emit gameScreenRequested();
+}
+
+void MainController::updatePlayersOnScreen(
+    const QVector<PlayerModel>& players
+    )
+{
+    // Обновляем модель
+    m_model->setPlayers(players);
+
+    // Обновляем UI
+    m_gameScreen->getLeftBarWidget()->updatePlayers(players);
 }
