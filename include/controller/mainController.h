@@ -36,26 +36,20 @@ private slots:
     void updatePlayersOnScreen(const QVector<PlayerModel>& players);
 
 private:
-    // ===== Helpers =====
     void prepareLocalPlayer(const QString& name, bool isServer);
+    void setupServerNetwork(PlayerModel& player);
+    void setupClientNetwork(PlayerModel& player, const QString& host);
+    void setupChat(bool isServer, void (NetworkController::*sendFunc)( const QJsonDocument&, MessageKind));
 
-    void setupChat(
-        bool isServer,
-        void (NetworkController::*sendFunc)(
-            const QJsonDocument&,
-            MessageKind
-            )
-        );
 
-private:
-    // ===== Core =====
-    GameModel* m_model;                 // НЕ владеем
-    NetworkController* m_network;       // ServerController / ClientController
+    GameModel* m_model;
+    NetworkController* m_network;
 
-    // ===== UI =====
+
     MenuWidget* m_menu;
     MainGameScreen* m_gameScreen;
 
-    // ===== Chat =====
+
     ChatController* m_chatController;
+    void showGameScreen();
 };

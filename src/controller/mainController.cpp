@@ -56,24 +56,9 @@ void MainController::startServer(const QString& playerName)
     prepareLocalPlayer(playerName, true);
     auto& player = m_model->localPlayer();
 
-    auto* server = new ServerController(&player, this);
-    m_network = server;
-
-    setupChat(
-        true,
-        &NetworkController::broadcast
-        );
-
-    connect(
-        server,
-        &ServerController::updatePlayers,
-        this,
-        &MainController::updatePlayersOnScreen,
-        Qt::UniqueConnection
-        );
-
-    server->emitInitialPlayers();
-    emit gameScreenRequested();
+    setupServerNetwork(player);
+    setupChat(true,&NetworkController::broadcast);
+    showGameScreen();
 }
 
 // =======================
@@ -94,13 +79,34 @@ void MainController::connectToServer(
     prepareLocalPlayer(playerName, false);
     auto& player = m_model->localPlayer();
 
+    setupClientNetwork(player, host);
+    setupChat(false,&NetworkController::sendChatMessage);
+    showGameScreen();
+}
+
+// =======================
+// Helpers
+// =======================
+
+void MainController::setupServerNetwork(PlayerModel& player)
+{
+    auto* server = new ServerController(&player, this);
+    m_network = server;
+
+    connect(
+        server,
+        &ServerController::updatePlayers,
+        this,
+        &MainController::updatePlayersOnScreen,
+        Qt::UniqueConnection
+        );
+
+    server->emitInitialPlayers();
+}
+void MainController::setupClientNetwork(PlayerModel& player, const QString& host)
+{
     auto* client = new ClientController(&player, host, this);
     m_network = client;
-
-    setupChat(
-        false,
-        &NetworkController::sendChatMessage
-        );
 
     connect(
         client,
@@ -111,12 +117,7 @@ void MainController::connectToServer(
         );
 
     client->connectToServer();
-    emit gameScreenRequested();
 }
-
-// =======================
-// Helpers
-// =======================
 
 void MainController::prepareLocalPlayer(const QString& name, bool isServer)
 {
@@ -154,6 +155,10 @@ void MainController::setupChat(
         m_network,
         sendFunc
         );
+}
+void MainController::showGameScreen()
+{
+    emit gameScreenRequested();
 }
 
 // =======================
