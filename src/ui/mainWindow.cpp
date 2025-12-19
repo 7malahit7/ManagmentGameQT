@@ -4,8 +4,8 @@
 MainWindow::MainWindow(MainController* controller, QWidget* parent)
     : QMainWindow(parent)
 {
-    menuScreen = controller->getMenu();
-    gameScreen = controller->getGameScreen();
+    menuScreen = controller->menu();
+    gameScreen = controller->gameScreen();
 
     screenSwitcher = new QStackedWidget(this);
     screenSwitcher->addWidget(menuScreen);
