@@ -4,6 +4,7 @@
 #include "gameModel.h"
 
 class NetworkController;
+class ChatController;
 class MenuWidget;
 class MainGameScreen;
 
@@ -15,7 +16,8 @@ public:
 
     MenuWidget* menu() const;
     MainGameScreen* gameScreen() const;
-
+    void startServer(const QString& playerName);
+    void connectToServer(const QString& playerName, const QString& host);
 signals:
     void gameScreenRequested();
 
@@ -25,4 +27,6 @@ private:
 
     MenuWidget* m_menu;               // View
     MainGameScreen* m_gameScreen;     // View
+
+    ChatController* m_chatController;
 };
