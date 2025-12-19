@@ -18,6 +18,7 @@ public:
     void connectToServer();
 
 private:
+    QByteArray m_buffer;
     QString host;
     QTcpSocket* socket = nullptr;
     QVector<PlayerModel> playersInfo;

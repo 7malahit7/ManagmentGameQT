@@ -47,6 +47,7 @@ MainGameScreen* MainController::gameScreen() const
 
 void MainController::startServer(const QString& playerName)
 {
+    qDebug() << "[] Starting as server";
     if (m_network) {
         qDebug() << "[MainController] Server already running";
         return;
@@ -95,6 +96,7 @@ void MainController::connectToServer(
     const QString& host
     )
 {
+    qDebug() << "[] Starting as client";
     if (m_network) {
         qDebug() << "[MainController] Already connected or connecting";
         return;
@@ -127,7 +129,14 @@ void MainController::connectToServer(
         m_network,
         &NetworkController::sendChatMessage
         );
-
+    connect(
+        client,
+        &ClientController::updatePlayers,
+        this,
+        &MainController::updatePlayersOnScreen,
+        Qt::UniqueConnection
+        );
+    client->connectToServer();
     emit gameScreenRequested();
 }
 
@@ -135,6 +144,7 @@ void MainController::updatePlayersOnScreen(
     const QVector<PlayerModel>& players
     )
 {
+    qDebug() << "[MainController] updatePlayersOnScreen, count =" << players.size();
     // Обновляем модель
     m_model->setPlayers(players);
 

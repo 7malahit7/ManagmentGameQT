@@ -21,6 +21,7 @@ public:
     ServerController(PlayerModel* player, QObject* parent = nullptr);
     void startServer();
 private:
+    QHash<QTcpSocket*, QByteArray> m_buffers;
     QJsonDocument sendNewClientToChat(const QString& name);
     void assignId(QTcpSocket* socket,int id);
     QTcpServer* server = nullptr;
