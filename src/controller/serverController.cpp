@@ -26,8 +26,12 @@ void ServerController::onDataReceived()
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
     if (!socket) return;
 
+    m_buffers[socket] += socket->readAll();
+    processIncomingBuffer(socket);
+}
+void ServerController::processIncomingBuffer(QTcpSocket* socket)
+{
     QByteArray& buffer = m_buffers[socket];
-    buffer += socket->readAll();
 
     while (true) {
         int idx = buffer.indexOf('\n');
@@ -48,17 +52,22 @@ void ServerController::onDataReceived()
             broadcast(doc, MessageKind::UserMessage);
         }
         else if (type == "new_client") {
-            QString name = root["name"].toString();
-            socketToPlayer[socket]->setName(name);
-
-            broadcast(sendNewClientToChat(name), MessageKind::SystemMessage);
-
-            playersInfo.append(PlayerModel(name, false, nextId));
-            emit updatePlayers(playersInfo);
-            broadcastPlayersInfo();
+            handleNewClient(socket, root);
         }
     }
 }
+void ServerController::handleNewClient(QTcpSocket* socket, const QJsonObject& root)
+{
+    QString name = root["name"].toString();
+    socketToPlayer[socket]->setName(name);
+
+    broadcast(sendNewClientToChat(name), MessageKind::SystemMessage);
+
+    playersInfo.append(PlayerModel(name, false, nextId));
+    emit updatePlayers(playersInfo);
+    broadcastPlayersInfo();
+}
+
 
 
 void ServerController::sendChatMessage(const QJsonDocument &msg, MessageKind isSystem)

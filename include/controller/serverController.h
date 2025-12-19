@@ -29,6 +29,7 @@ private:
     quint8 nextId = 1;
     QMap<QTcpSocket*, PlayerModel*> socketToPlayer;
     QVector<PlayerModel> playersInfo;
-
+    void processIncomingBuffer(QTcpSocket* socket);
+    void handleNewClient(QTcpSocket* socket, const QJsonObject& root);
     void broadcastPlayersInfo();
 };
