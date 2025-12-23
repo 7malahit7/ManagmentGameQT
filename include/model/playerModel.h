@@ -4,6 +4,26 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+
+
+enum class FactoryType
+{
+    Normal,
+    Automated
+};
+struct Factory
+{
+    FactoryType type = FactoryType::Normal;
+};
+
+//ссуды
+struct Loan
+{
+    int amount = 0;
+    int startMonth = 0;
+    int endMonth = 0;
+};
+
 class PlayerModel
 {
 public:
@@ -34,12 +54,31 @@ public:
     void setEsm(int newEsm);
     void setStatus(const QString &newStatus);
 
+    bool isBankrupt() const;
+    void setBankrupt(bool bankrupt);
+
     QJsonDocument toJson() const;
     QJsonObject toJsonObject() const;
     static PlayerModel fromJson(const QJsonObject &obj);
 
+    const QVector<Factory>& factories() const;
+    void addFactory(const Factory& factory);
+    int factoryCount() const;
+
+    int maxProductionCapacity() const;
+
+    const QVector<Loan>& loans() const;
+    void addLoan(const Loan& loan);
+    int totalLoanAmount() const;
+    void setLoans(const QVector<Loan>& loans);
+
+    bool isReady() const;
+    void setReady(bool ready);
+
 
 private:
+    bool m_ready = false;
+
     QString name;
     bool isServer;
     quint8 id;
@@ -48,6 +87,12 @@ private:
     int egp;
     int esm;
     QString status;
+
+    bool m_isBankrupt = false;
+
+    QVector<Factory> m_factories;
+
+    QVector<Loan> m_loans;
 };
 
 

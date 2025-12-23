@@ -18,7 +18,7 @@ void ChatController::sendChatMessage(const QString &text)
 
     QJsonDocument msg(obj);
     qDebug() << "[ChatController] message sent to Network";
-    emit sendMessageToNetwork(msg, MessageKind::UserMessage); // отправка через сеть
+    emit sendMessageToNetwork(msg, MessageKind::UserMessage);
 }
 
 void ChatController::onNetworkMessage(const QJsonDocument &msg, MessageKind isSystemMessage)
@@ -27,5 +27,5 @@ void ChatController::onNetworkMessage(const QJsonDocument &msg, MessageKind isSy
     QJsonObject obj = msg.object();
     QString senderName = obj["name"].toString();
     QString text = obj["text"].toString();
-    emit newMessageFromNetwork(QString("%1%2 %3").arg(senderName, isSystemMessage ? ' ' : ':' ,text), isSystemMessage); // отображение сообщения с именем
+    emit newMessageFromNetwork(QString("%1%2 %3").arg(senderName, isSystemMessage ? ' ' : ':' ,text), isSystemMessage);
 }

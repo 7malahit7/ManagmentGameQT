@@ -2,5 +2,6 @@
 enum MessageKind
 {
     UserMessage,
-    SystemMessage
+    SystemMessage,
+    PlayerReady
 };

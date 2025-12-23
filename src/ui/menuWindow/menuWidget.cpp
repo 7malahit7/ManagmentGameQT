@@ -18,6 +18,7 @@ MenuWidget::MenuWidget(QWidget* parent) : QWidget(parent)
     ipInput = new QLineEdit(this);
     ipInput->setPlaceholderText("Введите IP адрес...");
     ipInput->setFixedHeight(40);
+    ipInput->setText("127.1");
     mainLayout->addWidget(ipInput);
 
     mainLayout->addSpacing(60);

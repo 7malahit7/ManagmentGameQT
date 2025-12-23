@@ -1,14 +1,25 @@
 #include "clientController.h"
+
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonArray>
-ClientController::ClientController(PlayerModel* player, const QString &host, QObject *parent)
-    : NetworkController(player, parent), host{host}
-{}
+#include <QTcpSocket>
+
+ClientController::ClientController(
+    PlayerModel* player,
+    const QString& host,
+    QObject* parent
+    )
+    : NetworkController(player, parent),
+    host{host}
+{
+}
+
 
 void ClientController::connectToServer()
 {
-    if (socket) {
+    if (socket)
+    {
         qDebug() << "[ClientController] connectToServer called twice, ignoring";
         return;
     }
@@ -16,7 +27,7 @@ void ClientController::connectToServer()
     socket = new QTcpSocket(this);
 
     if (host.isEmpty())
-        host = "127.1";
+        host = "127.0.0.1";
 
     qDebug() << "[ClientController] Trying to connect to host" << host;
 
@@ -26,7 +37,7 @@ void ClientController::connectToServer()
         connect(socket, &QTcpSocket::readyRead,
                 this, &ClientController::onDataReceived);
 
-        sendNameToServer();   // ← здесь и ТОЛЬКО здесь
+        sendNameToServer();
         emit connected();
     });
 
@@ -38,26 +49,57 @@ void ClientController::connectToServer()
     socket->connectToHost(host, 7777);
 }
 
+void ClientController::sendChatMessage(
+    const QJsonDocument& msg,
+    MessageKind
+    )
+{
+    if (!socket)
+        return;
+
+    socket->write(messageToSendingByteArray(msg));
+    qDebug() << "[ClientController] Message sent to server";
+}
+
+void ClientController::broadcast(
+    const QJsonDocument&,
+    MessageKind
+    )
+{
+    qWarning() << "[ClientController] broadcast called on client!!";
+}
+
+void ClientController::sendReady(const QJsonDocument& doc)
+{
+    if (!socket)
+        return;
+
+    socket->write(messageToSendingByteArray(doc));
+    qDebug() << "[ClientController] READY sent to server";
+}
 
 void ClientController::sendNameToServer()
 {
     QJsonObject obj;
     obj["type"] = "new_client";
-    obj["name"] = localPlayer->getName();
+    obj["name"] = m_player->getName();
+
     socket->write(messageToSendingByteArray(obj));
 }
 
 void ClientController::onDataReceived()
 {
-    QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
-    if (!socket) return;
+    if (!socket)
+        return;
 
     m_buffer += socket->readAll();
     processIncomingBuffer();
 }
+
 void ClientController::processIncomingBuffer()
 {
-    while (true) {
+    while (true)
+    {
         int idx = m_buffer.indexOf('\n');
         if (idx == -1)
             break;
@@ -72,53 +114,41 @@ void ClientController::processIncomingBuffer()
         QJsonObject root = doc.object();
         QString type = root["type"].toString();
 
-        if (type == "players_info") {
+        if (type == "players_info")
+        {
             handlePlayersInfo(root);
         }
-        else if (type == "chat_message") {
+        else if (type == "chat_message")
+        {
             emit sendMessageToChatController(doc, MessageKind::UserMessage);
         }
-        else if (type == "system_message") {
+        else if (type == "system_message")
+        {
             emit sendMessageToChatController(doc, MessageKind::SystemMessage);
         }
-        else if (type == "assign_id") {
-            localPlayer->setId(root["id"].toInt());
+        else if (type == "assign_id")
+        {
+            m_player->setId(root["id"].toInt());
         }
     }
 }
+
 void ClientController::handlePlayersInfo(const QJsonObject& root)
 {
     playersInfo.clear();
 
     const QJsonArray arr = root["players"].toArray();
-    for (const auto& v : arr) {
+    for (const auto& v : arr)
+    {
         PlayerModel model = PlayerModel::fromJson(v.toObject());
-        if (model.getName() == localPlayer->getName()) {
-            *localPlayer = model;
+
+        if (model.getId() == m_player->getId() && m_player->getId() != 0)
+        {
+            *m_player = model;
         }
+
         playersInfo.append(model);
     }
 
     emit updatePlayers(playersInfo);
 }
-
-
-
-void ClientController::sendChatMessage(const QJsonDocument &msg, MessageKind isSystem)
-{
-    if(socket) {
-        socket->write(messageToSendingByteArray(msg));
-        qDebug() << "[ClientController] Message sent to server";
-    }
-}
-
-void ClientController::broadcast(const QJsonDocument &msg, MessageKind isSystem)
-{
-    qWarning() << "broadcast called on client!!";
-}
-
-
-
-
-
-

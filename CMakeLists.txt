@@ -6,19 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOMOC ON)
 
-#set(CMAKE_AUTORCC ON)
-                ## qt_add_resources(my_app "app_images"
-                ##     PREFIX "/"
-                ##     FILES
-                ##         images/copy.png
-                ##        images/cut.png
-                ##         images/new.png
-                ##         images/open.png
-                ##         images/paste.png
-                ##         images/save.png
-                ## )
-#
-
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Network)
 
 include_directories(
@@ -27,7 +14,6 @@ include_directories(
     include/ui/mainGameWindow
     include/ui/menu
     include/model
-
 )
 
 file(GLOB_RECURSE SOURCES

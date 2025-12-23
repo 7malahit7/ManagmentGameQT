@@ -1,27 +1,34 @@
 #pragma once
+
 #include <QObject>
-#include <QTcpServer>
-#include <QTcpSocket>
 #include <QJsonDocument>
-#include <QVector>
-#include "playerModel.h"
+#include <QJsonObject>
+#include <QByteArray>
+
 #include "message_types.h"
+#include "playerModel.h"
+
 class NetworkController : public QObject
 {
     Q_OBJECT
-protected:
-    PlayerModel *localPlayer;
-    QByteArray messageToSendingByteArray(const QJsonObject &obj);
-    QByteArray messageToSendingByteArray(const QJsonDocument &obj);
+signals:
+    void sendMessageToChatController(const QJsonDocument& doc,MessageKind kind);
 public:
     explicit NetworkController(PlayerModel* player, QObject* parent = nullptr);
-signals:
-    void sendMessageToChatController(const QJsonDocument &msg, MessageKind isSystemMessage);
-    void sendToNetwork();
+    virtual ~NetworkController() = default;
+
 public slots:
+    virtual void broadcast(const QJsonDocument&, MessageKind) = 0;
+    virtual void sendChatMessage(const QJsonDocument&, MessageKind) = 0;
+    virtual void sendReady(const QJsonDocument&) = 0;
+
+protected slots:
     virtual void onDataReceived() = 0;
-    virtual void sendChatMessage(const QJsonDocument &msg, MessageKind isSystem) = 0;
-    virtual void broadcast(const QJsonDocument &msg, MessageKind isSystem) = 0;
 
+protected:
+    QByteArray messageToSendingByteArray(const QJsonObject& obj) const;
+    QByteArray messageToSendingByteArray(const QJsonDocument& doc) const;
+
+protected:
+    PlayerModel* m_player;
 };
-

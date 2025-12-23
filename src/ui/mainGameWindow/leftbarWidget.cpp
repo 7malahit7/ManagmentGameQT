@@ -23,9 +23,7 @@ LeftBarWidget::LeftBarWidget(QWidget *parent) : QWidget(parent)
 
 void LeftBarWidget::clearPlayers()
 {
-    // Удаляем все виджеты игроков между полоской и stretch
     int count = mainLayout->count();
-    // 0 - playersLabel, 1 - headerLine, count-1 - stretch
     for (int i = count - 2; i > 1; --i)
     {
         QLayoutItem* item = mainLayout->takeAt(i);
@@ -37,7 +35,7 @@ void LeftBarWidget::clearPlayers()
         }
     }
 }
-void LeftBarWidget::addNewPlayer(const PlayerModel &playerInfo)
+void LeftBarWidget::addNewPlayer(const PlayerModel &playerInfo, const QString& status)
 {
     PlayerWidget* player = new PlayerWidget(playerInfo.getId(),
                                             playerInfo.getName(),
@@ -45,17 +43,35 @@ void LeftBarWidget::addNewPlayer(const PlayerModel &playerInfo)
                                             playerInfo.getBalance(),
                                             playerInfo.getEgp(),
                                             playerInfo.getEsm(),
-                                            playerInfo.getStatus(),
+                                            status,
                                             this);
     mainLayout->insertWidget(mainLayout->count() - 1, player);
+
 }
 
 void LeftBarWidget::updatePlayers(const QVector<PlayerModel>& players)
 {
+    qDebug() << "[UI] Players list updated:";
+
     clearPlayers();
+
     for (const auto& p : players)
     {
-        qDebug() << "added player";
-        addNewPlayer(p);
+        QString statusText;
+
+        if (p.isBankrupt())
+            statusText = "Банкрот";
+        else if (p.isReady())
+            statusText = "Готов";
+        else
+            statusText = "Ожидает...";
+
+        qDebug()
+            << " playerId =" << p.getId()
+            << " name =" << p.getName()
+            << " ready =" << p.isReady()
+            << " bankrupt =" << p.isBankrupt();
+
+        addNewPlayer(p, statusText);
     }
 }

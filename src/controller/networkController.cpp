@@ -1,18 +1,21 @@
 #include "networkController.h"
-#include <QDebug>
-#include <qjsonobject.h>
 
-NetworkController::NetworkController(PlayerModel* player, QObject *parent)
-    : QObject(parent), localPlayer{player}
+NetworkController::NetworkController(PlayerModel* player, QObject* parent)
+    : QObject(parent),
+    m_player(player)
 {
-    connect(this, &NetworkController::sendToNetwork, this, &NetworkController::onDataReceived);
 }
 
-QByteArray NetworkController::messageToSendingByteArray(const QJsonObject &obj)
+QByteArray NetworkController::messageToSendingByteArray(
+    const QJsonObject& obj
+    ) const
 {
     return QJsonDocument(obj).toJson(QJsonDocument::Compact) + '\n';
 }
-QByteArray NetworkController::messageToSendingByteArray(const QJsonDocument &obj)
+
+QByteArray NetworkController::messageToSendingByteArray(
+    const QJsonDocument& doc
+    ) const
 {
-    return obj.toJson(QJsonDocument::Compact) + '\n';
+    return doc.toJson(QJsonDocument::Compact) + '\n';
 }

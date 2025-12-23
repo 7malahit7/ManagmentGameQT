@@ -1,5 +1,4 @@
 #include "playerModel.h"
-#include <QJsonObject>
 
 PlayerModel::PlayerModel(const QString& name,
                          bool isServer,
@@ -66,4 +65,74 @@ PlayerModel PlayerModel::fromJson(const QJsonObject &obj)
                        obj.value("egp").toInt(404),
                        obj.value("esm").toInt(404),
                        obj.value("status").toString(QStringLiteral("404...")));
+}
+bool PlayerModel::isBankrupt() const
+{
+    return m_isBankrupt;
+}
+
+void PlayerModel::setBankrupt(bool bankrupt)
+{
+    m_isBankrupt = bankrupt;
+}
+const QVector<Factory>& PlayerModel::factories() const
+{
+    return m_factories;
+}
+
+void PlayerModel::addFactory(const Factory& factory)
+{
+    m_factories.push_back(factory);
+}
+
+int PlayerModel::factoryCount() const
+{
+    return m_factories.size();
+}
+
+int PlayerModel::maxProductionCapacity() const
+{
+    int capacity = 0;
+
+    for (const auto& factory : m_factories)
+    {
+        if (factory.type == FactoryType::Normal)
+            capacity += 1;
+        else if (factory.type == FactoryType::Automated)
+            capacity += 2;
+    }
+
+    return capacity;
+}
+
+const QVector<Loan>& PlayerModel::loans() const
+{
+    return m_loans;
+}
+
+void PlayerModel::addLoan(const Loan& loan)
+{
+    m_loans.push_back(loan);
+}
+
+int PlayerModel::totalLoanAmount() const
+{
+    int sum = 0;
+    for (const auto& loan : m_loans)
+        sum += loan.amount;
+    return sum;
+}
+
+void PlayerModel::setLoans(const QVector<Loan>& loans)
+{
+    m_loans = loans;
+}
+bool PlayerModel::isReady() const
+{
+    return m_ready;
+}
+
+void PlayerModel::setReady(bool ready)
+{
+    m_ready = ready;
 }
