@@ -37,6 +37,7 @@ TCP пошаговая экономическая игра, реализован
 ## P.S.
 В репозитории также есть `.zip` с готовым `.exe` и нужными `.dll` под Windows x64  
 Qt устанавливать не требуется.
+👉 [ManagmentGame_Windows_x64.zip](https://github.com/7malahit7/ManagmentGameQT/releases/download/ManagmentGame_Windows_x64.zip/ManagmentGame_Windows_x64.zip)
 
 ---
 
