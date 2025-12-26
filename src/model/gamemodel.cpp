@@ -245,7 +245,7 @@ void GameModel::advanceMarketLevel()
     const int currentLevel = qBound(1, m_market.level, 5);
     const int row = currentLevel - 1;
 
-    const double r = QRandomGenerator::global()->generateDouble();
+    const double r = QRandomGenerator::global()->generateDouble(); // [0;1] double
 
     double acc = 0.0;
     int nextLevel = currentLevel;
@@ -691,8 +691,3 @@ void GameModel::payFixedCosts()
 
     checkBankruptcies();
 }
-
-
-
-
-

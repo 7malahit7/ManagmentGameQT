@@ -17,24 +17,24 @@ enum class GameState
     MonthStart,
 
     //МЕСЯЧНЫЙ ЦИКЛ
-    PayFixedCosts,
-    MarketDetermination,
+    PayFixedCosts,          //  Постоянные издержки
+    MarketDetermination,    //  Определение рынка
 
-    RawMaterialBidding,
-    RawMaterialAllocation,
+    RawMaterialBidding,     //  Заявки на ЕСМ
+    RawMaterialAllocation,  //  Распределение ЕСМ
 
-    ProductionDecision,
-    ProductionExecution,
+    ProductionDecision,     //  Решения о производстве
+    ProductionExecution,    //  Производство
 
-    ProductBidding,
-    ProductAllocation,
+    ProductBidding,         //  Заявки на продажу ЕГП
+    ProductAllocation,      //  Продажа ЕГП
 
-    LoanInterestPayment,
-    LoanRepayment,
+    LoanInterestPayment,    //  Проценты по кредитам
+    LoanRepayment,          //  Погашение кредитов
     LoanTaking,
 
-    ConstructionDecision,
-    ConstructionProgress,
+    ConstructionDecision,   // 8. Взятие новых кредитов
+    ConstructionProgress,   // Конец месяца
 
     MonthEnd,
 
