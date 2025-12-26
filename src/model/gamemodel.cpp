@@ -1,5 +1,5 @@
 #include "gameModel.h"
-
+//TODO Очень толстая модель - раскидать по файлам
 struct MarketLevelInfo
 {
     double esmMultiplier;
