@@ -24,11 +24,11 @@
 - CMake 3.10+
 
 ### Сборка
-git clone https://github.com/7malahit7/ManagmentGameQT.git
-cd ManagmentGameQT
-mkdir build && cd build
-cmake ..
-cmake --build .
+- git clone https://github.com/7malahit7/ManagmentGameQT.git
+- cd ManagmentGameQT
+- mkdir build && cd build
+- cmake ..
+- cmake --build .
 
 Запуск выполняется из каталога build после успешной компиляции.
 
